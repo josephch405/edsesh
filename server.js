@@ -33,14 +33,59 @@ var client_face = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 var client_emotion = new oxford.Client('f459d95e5a634e2b8536c48f2e82e41c');
 
 // detect face
+
 client_face.face.detect({
-    path: 'oba.jpg',
-    analyzesAge: true,
-	analyzesGender: true
+	path: img_path + 10 + '.jpg',
 	analyzesHeadPose: true
-}).then(function (response) {
-    console.log(response);
+}).then (function (response){
+	calc_attention(response)
 });
+
+var calc_attention = function(response){
+	if (response.length == 0) {
+		console.log('Sleeping!');
+	} else{ 
+	for (var j = 0; j < response.length; j++){
+		var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)
+		var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)
+		var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)
+		var distance = 0;
+		if (h_yaw > 10) {
+			distance = distance + math.square((h_yaw - 10));
+		}
+		if (h_pitch > 10) {
+			distance = distance + math.square((h_pitch - 10));
+		}
+		if (h_roll > 10) {
+			distance = distance + math.square((h_roll));
+		}
+		var val_distraction =  
+		console.log(h_yaw + ', ' + h_pitch + ', ' + h_roll);
+		// var distance = h_yaw * h_yaw + h_pitch * h_pitch + h_roll * h_roll
+		// var att_value = 10 - 10*Math.tanh(0.1*distance)
+		// console.log('Your attention value is ' + att_value);
+	}}
+}
+
+var getHeadPose = function(img_path){
+	console.log(img_path)
+	client_face.face.detect({
+		path: img_path,
+		analyzesAge: true,
+		analyzesGender: true,
+		analyzesHeadPose: true
+	}).then(function (response) {
+		for (j = 0; j < response.length; j++){
+			console.log(response[j].faceAttributes.headPose);
+		}
+	});
+}
+
+// getHeadPose("1.jpg")
+// getHeadPose("2.jpg")
+// getHeadPose("3.jpg")
+// getHeadPose("4.jpg")
+getHeadPose("5.jpg")
 
 // calculate attention level
 var calc_attention = function(img_path){
