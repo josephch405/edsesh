@@ -37,11 +37,14 @@ var Faces = {
             console.log(response);
         });
     },
-    calc_attention: function(img_path) {
+    calc_attention: function(img_path, cb) {
+        console.log("calc attention start")
         client_emotion.emotion.analyzeEmotion({
             path: img_path,
         }).then(function(response) {
+            console.log("calc attention cb")
             // iterate over all faces in the image
+            console.log("")
             for (var j = 0; j < response.length; j++) {
                 // diff with mean of engaged student data
                 var diff_e_anger = response[j].scores.anger - m_e_anger;
@@ -76,6 +79,7 @@ var Faces = {
                 var engagement = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
 
                 console.log("Your attention level is:" + engagement);
+                cb(engagement)
             }
         });
     },
