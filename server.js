@@ -21,9 +21,11 @@ app.server = http.createServer(app);
 // 	exposedHeaders: config.corsHeaders
 // }));
 
-app.use(bodyParser.json({
-	limit : 10000
-}));
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
 
 app.get("/teacher1", function(req, res){
 	res.sendFile('public/teacher1.html', {root: __dirname })
@@ -39,6 +41,7 @@ app.get("/ajax/engagement", function(req,res){
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
    console.log(req.files)
+   console.log(req.body)
    res.send("done");
 });
 

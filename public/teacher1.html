@@ -71,7 +71,8 @@
 				'<img src="'+data_uri+'"/>';
 
 			var blob = new Blob([binEncode(data_uri), {type: "image/jpeg"}])
-			$.post("/img", {pic: binEncode(data_uri)})
+			
+			$.post("/img", {pic: blob})
 		} );
 
 	}, 3000);
