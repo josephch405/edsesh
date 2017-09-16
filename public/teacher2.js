@@ -42,7 +42,7 @@ var chart = new Chart(ctx, {
         datasets: [{
             label: "Student 1",
             fill: false,
-            borderColor: 'rgb(255,69,0)',
+            borderColor: 'rgb(200,69,0)',
             data: students.series[0]
         }]
     },
