@@ -31,6 +31,10 @@ app.get("/teacher2", function(req, res){
 	res.sendFile('public/teacher2.html', {root: __dirname })
 })
 
+app.get("/ajax/engagement", function(req,res){
+	res.send(200, Math.random() * 5)
+})
+
 app.get("/student", function(req, res){
 	res.sendFile('public/student.html', {root: __dirname })
 })
