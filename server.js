@@ -22,6 +22,8 @@ var storage = multer.diskStorage({
   }
 });
 
+var engagement = 0;
+
 var upload = multer({ storage: storage })
 
 let app = express();
@@ -35,17 +37,28 @@ app.use(bodyParser.json())
 
 Faces.calc_attention("imgs/confused-students/img-02.jpg")
 
+app.get("/teacher1", function(req, res){
+	res.sendFile('public/teacher1.html', {root: __dirname })
+})
+
+app.get("/teacher2", function(req, res){
+	res.sendFile('public/teacher2.html', {root: __dirname })
+})
+
 app.get("/ajax/engagement", function(req,res){
-	res.send(200, Math.random() * 5)
+	res.send(200, engagement)
 })
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
-   console.log(req.file)
-   console.log(req.body)
-   Faces.calc_attention("img/" + req.file)
+   //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
+   Faces.calc_attention("img/" + req.file.filename, updateEngagement)
 
    res.send("done");
 });
+
+function updateEngagement(v){
+	engagement = v;
+}
 
 app.post('/help', function(req,res){
 	//console.log(req.body)
