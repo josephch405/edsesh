@@ -29,9 +29,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="button">
-                        <button type="button" data-dismiss="modal">Login</button>
-                    </div>
+                        <button class="button" type="button" data-dismiss="modal">Login</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -40,14 +38,21 @@
     </div>
     <!-- /.modal -->
     <div id="student" class="col-xs-12 col-md-8 col-md-offset-2">
-        <br />
-            <input class = "button" type="button" id="panicButton" value="HELP" onclick='submitPanic()'>
+        <br><br>
+        <input class="button sButton" type="button" id="help" value="HELP" onclick='submitPanic()'>
+        <input class="button sButton" type="button" id="ask" value="ASK" onclick='question()'>
+        <br><br><br><br>
+        <input class="button sButton" type="button" id="AA" value="A" onclick='ic(0)'>
+        <input class="button sButton" type="button" id="BB" value="B" onclick='ic(1)'>
+        <input class="button sButton" type="button" id="CC" value="C" onclick='ic(2)'>
+        <input class="button sButton" type="button" id="DD" value="D" onclick='ic(3)'>
     </div>
     <script src="jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="chartist.min.js"></script>
 </body>
 <script>
+  var userId = Math.floor(Math.random() * 2000000);
 function submitPanic() {
     console.log(document.getElementById("panicButton").value)
     $.ajax({
@@ -55,7 +60,17 @@ function submitPanic() {
         url: '/help',
         data: document.getElementById("panicButton").value
     })
-
+}
+function ic(n){
+  console.log("iclicker ", n)
+    $.ajax({
+        type: "POST",
+        url: '/ic',
+        data: {
+          n: n,
+          userId: userId
+        }
+    })
 }
 $("#studentModal").modal({
     backdrop: 'static',

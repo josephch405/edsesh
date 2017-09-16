@@ -93,13 +93,13 @@
 	margin: 2vh;
 	border-radius: 1vh;
 	box-shadow: 0 0 2vh 0 rgba(0,0,0,.2);
-	margin-left: 4vh;
-	margin-right: 4vh;
+	// margin-left: 2vh;
+	// margin-right: 2vh;
 	font-size: 2vh;
 	transition: all 0.1s ease-out;
 }
 
-.button input, .button button, #panicButton{
+.button input, .button button, .sButton, button{
 	background-color: Transparent;
     background-repeat:no-repeat;
     border: none;
@@ -121,21 +121,43 @@
 	text-align: center;
 }
 
-#panicButton{
-	margin: 10vw;
+.sButton{
+	margin: 2vw;
 	font-size: 8vw;
 	line-height: 20vw;
-	width: 50vw;
-	height: 50vw;
-	background-color: #FF654C;
-	max-width: 400px;
-	max-height: 400px;
-	box-shadow: 0 0 4vh 0 rgba(0,0,0,.5);
+	width: 36vw;
+	height: 36vw;
+	max-width: 300px;
+	max-height: 300px;
+	box-shadow: 0 0 3vh 0 rgba(0,0,0,.3);
 }
 
-#panicButton:active{
-	box-shadow: none;
+#help{
+	background-color: #FFB400;
+}
 
+#ask{
+	background-color: #C67001;
+}
+
+#AA{
+	background-color: #00A2FF;
+}
+
+#BB{
+	background-color: #09F941;
+}
+
+#CC{
+	background-color: #9C00FF;
+}
+
+#DD{
+	background-color: #FF0000;
+}
+
+.sButton:active{
+	box-shadow: none;
 }
 
 .modal-header{
@@ -146,4 +168,13 @@
 .modal-footer{
 	// padding: 3vh;
 	border: none;
+}
+
+#pieDiv{
+	max-width: 300px;
+	margin: auto;
+}
+
+.modal-body{
+	text-align: center;
 }

@@ -5,15 +5,43 @@
     <link rel="stylesheet" href="bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="main.less">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 </head>
+<div id="t1Modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Student Poll</h4>
+            </div>
+            <div class="modal-body">
+                <div id="pieDiv">
+                    <canvas id="chart"></canvas>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="button" id="newPoll" type="button">New Poll</button>
+                <button class="button" type="button" data-dismiss="modal">Done</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <body>
     <div id="teacher1" class="col-xs-12 col-md-8 col-md-offset-2">
         <iframe id="presentation" src="https://docs.google.com/presentation/d/e/2PACX-1vTIAvaegRYpOpDEJ3SdbZ6heEQT8f1wFH-aU9CA6hBxXBeBrZSiEGS-iAHapOrLBlv9rYOxNJPikdOL/embed?start=false&loop=true&delayms=30000" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
     </div>
     <div id="bottomBar">
-    	<img id = "bottomLogo" src = "./art/logo.png">
-    	<a href="./teacher2" target="_blank"><div class="button">Analytics</div></a>
+        <img id="bottomLogo" src="./art/logo.png">
+        <a href="./teacher2" target="_blank">
+            <div class="button">Analytics</div>
+        </a>
+        <a href="#">
+            <div id="polling" class="button">Polling</div>
+        </a>
     </div>
     <script src="jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
@@ -70,6 +98,50 @@
         });
 
     }, 3000);
+
+    var ctx = {};
+    var data = {};
+    var pChart = {};
+    var up = function() {
+        $.get("/ic/list", function(list) {
+            pChart.data.datasets[0].data = list;
+            pChart.update();
+        })
+    }
+
+    $('#newPoll').on("click", function() {
+        $.get("/ic/new", function(list) {
+            pChart.data.datasets[0].data = list;
+            pChart.update();
+        })
+    })
+
+    $("#polling").on("click", function() {
+
+        ctx = document.getElementById('chart').getContext('2d');
+        data = {
+            datasets: [{
+                data: [0, 0, 0],
+                backgroundColor: ["#00A2FF", "#09F941", "#9C00FF", "#FF0000"]
+            }],
+            labels: [
+                'A', 'B', 'C', 'D'
+            ]
+        }
+
+        pChart = new Chart(ctx, {
+            type: 'pie',
+            data: data
+        });
+
+        up();
+
+        setInterval(up, 3000)
+
+        $("#t1Modal").modal({
+            keyboard: false
+        })
+    })
     </script>
 </body>
 
