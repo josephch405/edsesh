@@ -6,8 +6,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const path = require('path')
-var multer  = require('multer')
-var crypto = require('crypto')
+const multer  = require('multer')
+const crypto = require('crypto')
+
+const Faces = require('./faces')
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -15,13 +17,16 @@ var storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     crypto.pseudoRandomBytes(16, function (err, raw) {
-      cb(null, Date.now() + '.png');
+      cb(null, Date.now() + '.jpg');
     });
   }
 });
 
+var engagement = 0;
+
 var upload = multer({ storage: storage })
 
+<<<<<<< HEAD
 // means of engaged students
 const m_e_anger = 0.001266617;
 const m_e_contempt = 0.002459111;
@@ -147,6 +152,10 @@ var calc_attention = function(img_path){
 		}
 	});
 }
+=======
+let app = express();
+app.server = http.createServer(app);
+>>>>>>> master
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -154,52 +163,30 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-calc_attention("imgs/confused-students/img-02.jpg")
+Faces.calc_attention("imgs/confused-students/img-02.jpg")
 
-// write emotion data to csv file
-function prepare_emotion_data(){
-	var writer = csvWriter({
-		headers: ["img","anger","contempt","disgust","fear","happiness","neutral","sadness","surprise"]
-	})
-	var img_path = 'imgs/engaged-students/';
-	writer.pipe(fs.createWriteStream('out_engaged.csv'));
-	for (var i=0; i<6; i++){
-		runImage(i, img_path, writer);
-	}
-}
+app.get("/teacher1", function(req, res){
+	res.sendFile('public/teacher1.html', {root: __dirname })
+})
 
-// send a POST request to the api to get emotion data on a particular
-// image of name "img-[i].jpg"
-var runImage = function(i, img_path, writer){
-	var img =  img_path + 'img-' + (i>9? ""+i : "0"+i) + '.jpg';
-	client_emotion.emotion.analyzeEmotion({
-		path: img,
-	}).then(function (response) {
-		for (var j = 0; j < response.length; j++){
-			var val_anger = response[j].scores.anger;
-			var val_contempt = response[j].scores.contempt;
-			var val_disgust = response[j].scores.disgust;
-			var val_fear = response[j].scores.fear;
-			var val_happiness = response[j].scores.happiness;
-			var val_neutral = response[j].scores.neutral;
-			var val_sadness = response[j].scores.sadness;
-			var val_surprise = response[j].scores.surprise;
-			writer.write([i+ "-" + j,val_anger,val_contempt,val_disgust,
-				val_fear,val_happiness,val_neutral,
-				val_sadness,val_surprise])
-		}
-	});
-}
+app.get("/teacher2", function(req, res){
+	res.sendFile('public/teacher2.html', {root: __dirname })
+})
 
 app.get("/ajax/engagement", function(req,res){
-	res.send(200, Math.random() * 5)
+	res.send(200, engagement)
 })
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
-   console.log(req.file)
-   console.log(req.body)
+   //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
+   Faces.calc_attention("img/" + req.file.filename, updateEngagement)
+
    res.send("done");
 });
+
+function updateEngagement(v){
+	engagement = v;
+}
 
 app.post('/help', function(req,res){
 	//console.log(req.body)
