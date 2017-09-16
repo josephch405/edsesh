@@ -11,6 +11,11 @@ const crypto = require('crypto')
 
 const Faces = require('./faces')
 
+var dir = './img';
+if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+}
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './img/')
@@ -21,6 +26,8 @@ var storage = multer.diskStorage({
     });
   }
 });
+
+var icRoster = {};
 
 var confusion = 0;
 var distraction = 0;
@@ -69,6 +76,24 @@ app.post('/help', function(req,res){
 	//console.log(req.body)
 	res.send("")
 });
+
+app.post('/ic', function(req, res){
+	icRoster[req.body.userId] = req.body.n;
+})
+
+app.get('/ic/list', function(req, res){
+	var c = [0, 0, 0, 0];
+	for(var p in icRoster){
+		c[icRoster[p]] += 1;
+	}
+	res.send(c)
+})
+
+app.get('/ic/new', function(req, res){
+	icRoster = {};
+	res.send([0, 0, 0, 0])
+})
+
 
 app.get("/student", function(req, res){
 	res.sendFile('public/student.html', {root: __dirname })
