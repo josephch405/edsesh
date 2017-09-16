@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path')
+var multer  = require('multer')
+var upload = multer({ dest: 'img/' })
 // import initializeDb from './db';
 // import middleware from './middleware';
 // import api from './api';
@@ -34,6 +36,11 @@ app.get("/teacher2", function(req, res){
 app.get("/ajax/engagement", function(req,res){
 	res.send(200, Math.random() * 5)
 })
+
+app.post('/img', upload.single('pic'), function (req, res, next) {
+   console.log(req.files)
+   res.send("done");
+});
 
 app.get("/student", function(req, res){
 	res.sendFile('public/student.html', {root: __dirname })
