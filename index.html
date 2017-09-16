@@ -1,0 +1,235 @@
+<html>
+<head>
+<!-- Load the d3 library. -->
+<script src="d3.v4.min.js" charset="utf-8"></script>
+<style>
+.bar rect { fill: #ccc; }
+.axis path { fill: none; stroke: black;}
+.axis line { stroke: black; }
+.axis text { font-size: x-small; }
+path.timeseries { fill: none; stroke: #333; stroke-width: 3; opacity: 0.4; }
+</style>
+</head>
+<body>
+
+<div id="engagementPlot"></div>
+
+<div id="engagementChangePlot"></div>
+
+<script>
+
+var height = 500;
+var width = 800;
+var padding = 60;//increased padding to make more room for axis & axis labels
+
+// A useful variable reference outside the scope of the tsv callback.
+var personTimeSeries;
+
+// Plot the employment timeseries for each selected state from 1990 to 2016
+function plotEngagement(personTimeSeries) {//Note: in this function, I took some code from class notes
+	var svg = d3.select("#engagementPlot").append("svg")
+			.attr('height', height)
+			.attr('width', width);
+
+	var scaleY = d3.scaleLinear().domain([0,1]).range([height - padding, padding]);
+	var scalePerson = d3.scaleOrdinal(d3.schemeCategory10);//scale for color for each line & label for each line
+
+	var xAxis = d3.axisBottom().scale(scaleX);//axis for time
+		svg.append("g")
+  			.attr("class", "axis")
+  			.attr("transform", "translate(0, " + (height-padding) + ")")
+  			.call(xAxis.tickFormat(d3.timeFormat("%Y")));
+
+	var yAxis = d3.axisLeft().scale(scaleY);//axis for engagement
+		svg.append("g")
+	        .attr("class", "axis")
+	        .attr("transform", "translate("+padding+",0)")
+	        .call(yAxis);
+
+	svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height - padding/2) + ")")
+      .style("text-anchor", "middle")
+      .text("Time");
+
+    svg.append("text")
+      .attr("transform", "rotate(90)")
+      .attr("y", -padding/2)
+      .attr("x", height / 2)
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Engagement");  
+
+	var pathGenerator = d3.line()
+		.x(function (d) { return scaleX(d.Time); })
+		.y(function (d) { return scaleY(d.Engagement); });
+
+	var paths = svg.append("g").selectAll("path.timeseries").data(personTimeSeries);
+	
+	paths.enter().append("path")
+	.merge(paths)
+	.attr("class", "timeseries")
+	.attr("d", function(d) {
+		return pathGenerator(d.values);
+	})	
+	.style("stroke", function(sector, i) {
+		return scalePerson(i);
+	});
+
+	for(var i = 0; i < personTimesSeries.length; i++){
+		svg.append("text")
+			.attr("transform", "translate(" + (width - padding + 5) + "," + scaleY(personTimeSeries[i].values[personTimeSeries[i].values.length-1].Engagement) + ")")
+			.attr("dy", ".35em")
+			.attr("text-anchor", "start")
+			.text(personTimeSeries[i].key)
+			.style("fill", scalePerson(i));
+	}
+	
+}
+
+// Plot the change in employment timeseries for the same states from 1990 to 2016.
+function plotEngagementChange(personTimeSeries) {
+	var svg = d3.select("#engagementChangePlot").append("svg")
+			.attr('height', height)
+			.attr('width', width);
+	// Define scales, axes.
+	//maxV & minV are the maximum/minimum number I need to plot for job change
+	var maxV = d3.max(personTimeSeries, function (d){ 
+		return d3.max(d.values, function (e){ return e.v;});
+	})
+	var minV = d3.min(personTimeSeries, function (d){ 
+		return d3.min(d.values, function (e){ return e.v;});
+	})
+	var scaleY = d3.scaleLinear().domain([minV, maxV]).range([height - padding, padding]);//scales employment to y-axis
+	var scalePerson = d3.scaleOrdinal(d3.schemeCategory10);
+
+	var xAxis = d3.axisBottom().scale(scaleX);//axis for date
+		svg.append("g")
+  			.attr("class", "axis")
+  			.attr("transform", "translate(0, " + (height-padding) + ")")
+  			.call(xAxis.tickFormat(d3.timeFormat("%Y")));
+
+	var yAxis = d3.axisLeft().scale(scaleY);//axis for jobs
+		svg.append("g")
+	        .attr("class", "axis")
+	        .attr("transform", "translate("+padding+",0)")
+	        .call(yAxis);
+
+	svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height - padding/2) + ")")
+      .style("text-anchor", "middle")
+      .text("Date");
+
+    svg.append("text")
+      .attr("transform", "rotate(90)")
+      .attr("y", -padding/2)
+      .attr("x", height / 2)
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Change in Engagement");  
+
+	var pathGenerator = d3.line()
+		.x(function (d) { return scaleX(d.Date); })
+		.y(function (d) { return scaleY(d.v); });
+
+	var paths = svg.append("g").selectAll("path.timeseries").data(personTimeSeries);
+	
+	paths.enter().append("path")
+	.merge(paths)
+	.attr("class", "timeseries")
+	.attr("d", function(d) {
+		return pathGenerator(d.values);
+	})	
+	.style("stroke", function(sector, i) {
+		return scalePerson(i);
+	});
+
+		svg.append("text")
+			.attr("transform", "translate(" + (width - padding + 5) + "," + (scaleY(personTimeSeries[0].values[personTimeSeries[0].values.length-1].v) - 8) + ")")
+			.attr("dy", ".35em")
+			.attr("text-anchor", "start")
+			.text(personTimeSeries[0].key)
+			.style("fill", scalePerson(0));
+
+		svg.append("text")
+			.attr("transform", "translate(" + (width - padding + 5) + "," + (scaleY(personTimeSeries[1].values[personTimeSeries[1].values.length-1].v) - 8) + ")")
+			.attr("dy", ".35em")
+			.attr("text-anchor", "start")
+			.text(personTimeSeries[1].key)
+			.style("fill", scalePerson(1));
+
+		svg.append("text")
+			.attr("transform", "translate(" + (width - padding + 5) + "," + (scaleY(personTimeSeries[2].values[personTimeSeries[2].values.length-1].v) ) + ")")
+			.attr("dy", ".35em")
+			.attr("text-anchor", "start")
+			.text(personTimeSeries[2].key)
+			.style("fill", scalePerson(2));
+
+		svg.append("text")
+			.attr("transform", "translate(" + (width - padding + 5) + "," + (scaleY(personTimeSeries[3].values[personTimeSeries[3].values.length-1].v)  + 8) + ")")
+			.attr("dy", ".35em")
+			.attr("text-anchor", "start")
+			.text(personTimeSeries[3].key)
+			.style("fill", scalePerson(3));
+}
+
+function parseLine(row) {
+	row.Engagement = Number(row.Engagement);
+	row.ID = Date.parse(row.ID);
+	row.Time = Number(row.Time);
+	return row;
+}
+
+var formatter = d3.format(".4f");
+var maxX;
+var scaleX = d3.scaleLinear().domain([0, maxX]).range([0 + padding, width- padding]);
+
+//data contains student id, student name, time since start, engagement as a float 0 to 1
+d3.tsv("data.tsv", parseLine, function (error, data) {
+	personTimeSeries = d3.nest().key(function (d) { return d.Name; }).entries(data);
+
+	personTimeSeries.forEach(function (d) {
+		var values = d.values;
+		
+		var smoothedValues = [];
+		smoothedValues.push(values[0].Engagement);
+		for(var i = 1; i < values.length - 1; i++){
+			smoothedValues[i] = (values[i].Engagement + values[i-1].Engagement + values[i+1].Engagement)/3.0;
+		}
+		smoothedValues.push(values[values.length-1].Engagement);
+		for(var i = 0; i < values.length; i++){
+			values[i].Engagement = smoothedValues[i];
+		}
+
+		var velocities = [];
+		velocities[0] = 0;
+		for(var i = 1; i < values.length; i++){
+			velocities[i] = values[i].Engagment - values[i-1].Engagement;
+		}
+
+		var smoothedVelocities = [];
+		smoothedVelocities.push(velocities[0]);
+		for(var i = 1; i < values.length - 1; i++){
+			smoothedVelocities[i] = (velocities[i] + velocities[i-1] + velocities[i+1])/3.0;
+		}
+		smoothedVelocities.push(velocities[values.length-1]);
+
+		for(var i = 0; i < values.length; i++){
+			values[i].v = smoothedVelocities[i];
+		}
+	});
+	maxX = d3.max(personTimeSeries, function (d){ 
+		return d3.max(d.values, function (e){ return e.Engagement;});
+	})
+	
+	// Create plot for engagement and delta engagement.
+	plotEngagement(personTimeSeries);
+	plotEngagementChange(personTimeSeries);
+});
+
+</script>
+</body>
+</html>
