@@ -1,8 +1,8 @@
 // start project oxford 
 var oxford = require('project-oxford');
 var client_face = new oxford.Client('0e44c5b59530422ca9d3c6597499689d');
-var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
-// var client_getname = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
+//var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
+//var client_getname = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 var client_emotion = new oxford.Client('f459d95e5a634e2b8536c48f2e82e41c');
 
 // means of engaged students
@@ -67,7 +67,7 @@ var Faces = {
                     diff_ue_disgust * diff_ue_disgust + diff_ue_fear * diff_ue_fear +
                     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
-                // confusion of the student
+                // engagement of the student
                 var confusion = s/2 - s * Math.tanh(c * distance_ue);
                 console.log("The confusion level of the current student is:" + confusion);
                 confusion_sum += confusion
@@ -90,7 +90,7 @@ var Faces = {
                 console.log("Face Id: " + response[j].faceId);
             }
             client_recognize.face.identify(
-                face_arr,
+                faceId_arr,
                 'student'    
             ).then(function(response){
                 for (var j = 0; j < response.length; j++){
@@ -101,7 +101,7 @@ var Faces = {
                         'student', 
                         personId
                         ).then(function(response){
-                           console.log(response[0]);
+                           console.log(response);
                     })
                 }
             })
