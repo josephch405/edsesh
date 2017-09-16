@@ -45,6 +45,11 @@ app.post('/img', upload.single('pic'), function (req, res, next) {
    res.send("done");
 });
 
+app.post('/help', function(req,res){
+	//console.log(req.body)
+	res.send("")
+});
+
 app.get("/student", function(req, res){
 	res.sendFile('public/student.html', {root: __dirname })
 })
