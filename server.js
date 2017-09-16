@@ -11,6 +11,8 @@ const crypto = require('crypto')
 
 const Faces = require('./faces')
 
+const Emotions = require('./db')
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './img/')
@@ -23,7 +25,7 @@ var storage = multer.diskStorage({
 });
 
 var engagement = 0;
-
+var sessionNumber = 0;
 var upload = multer({ storage: storage })
 
 let app = express();
@@ -35,10 +37,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-Faces.calc_attention("imgs/confused-students/img-02.jpg")
+//Faces.calc_attention("imgs/confused-students/img-02.jpg")
 
-app.get("/teacher1", function(req, res){
-	res.sendFile('public/teacher1.html', {root: __dirname })
+app.get("/t1", function(req, res){
+  console.log("test");
+  sessionNumber = new Date().getTime();
+  var s = new Emotions({
+    session: sessionNumber,
+    confusion: [],
+    distraction: []
+  });
+  s.save(function(){
+    res.sendFile('public/teacher1.html', {root: __dirname })
+  });
 })
 
 app.get("/teacher2", function(req, res){
@@ -52,7 +63,12 @@ app.get("/ajax/engagement", function(req,res){
 app.post('/img', upload.single('pic'), function (req, res, next) {
    //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
    Faces.calc_attention("img/" + req.file.filename, updateEngagement)
-
+   var s = Emotions.findOne({session: sessionNumber}, function(err, emotion){
+     console.log(emotion)
+     emotion.confusion.push({date: Date.now(), level: 1})
+     emotion.distraction.push({date: Date.now(), level: 2})
+     emotion.save()
+   })
    res.send("done");
 });
 
