@@ -91,7 +91,7 @@ var Faces = {
                 console.log("Face Id: " + response[j].faceId);
             }
             client_recognize.face.identify(
-                face_arr,
+                faceId_arr,
                 'student'    
             ).then(function(response){
                 for (var j = 0; j < response.length; j++){

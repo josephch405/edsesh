@@ -44,7 +44,7 @@ var chart = new Chart(ctx, {
         }, {
             label: "Confusion",
             fill: false,
-            borderColor: 'rgb(200,69,0)',
+            borderColor: 'rgb(69,200,0)',
             data: students.series[1]
         }]
     },

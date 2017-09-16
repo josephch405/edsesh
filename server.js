@@ -56,6 +56,10 @@ app.get("/ajax/confusion", function(req,res){
 	res.send(200, confusion)
 })
 
+app.get("/ajax/distraction", function(req,res){
+	res.send(200, distraction)
+})
+
 var num_students = 1;
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
