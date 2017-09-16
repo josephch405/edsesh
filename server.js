@@ -35,7 +35,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-Faces.calc_attention("imgs/confused-students/img-02.jpg")
+//Faces.calc_attention("imgs/confused-students/img-02.jpg")
 
 app.get("/teacher1", function(req, res){
 	res.sendFile('public/teacher1.html', {root: __dirname })
