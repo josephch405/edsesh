@@ -60,7 +60,6 @@
 	    for (var i = 0; i < max; i++) {
 	        s = c + s; } return s;
 	    }
-	    console.log(binArray);
 	}
 
 	setInterval(function(){
@@ -71,7 +70,15 @@
 				'<img src="'+data_uri+'"/>';
 
 			var blob = new Blob([binEncode(data_uri), {type: "image/jpeg"}])
-			$.post("/img", {pic: binEncode(data_uri)})
+
+			var data = new FormData();
+			data.append('pic',blob)
+			$.ajax({
+				url: "/img",
+				data: data,
+				contentType: false,
+				processData: false
+			});
 		} );
 
 	}, 3000);
