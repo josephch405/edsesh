@@ -2,6 +2,8 @@
 <head>
     <link rel="stylesheet" href="chartist.min.css">
     <link rel="stylesheet" href="bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link rel="stylesheet" href="main.less">
 </head>
 
 <body>
@@ -62,9 +64,6 @@
 	setInterval(function(){
 		Webcam.snap( function(data_uri) {
 			// display results in page
-			document.getElementById('results').innerHTML =
-				'<h2>Here is your image:</h2>' +
-				'<img src="'+data_uri+'"/>';
 
 			var blob = dataURItoBlob(data_uri)
 

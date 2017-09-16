@@ -4,7 +4,20 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path')
 var multer  = require('multer')
-var upload = multer({ dest: 'img/' })
+var crypto = require('crypto')
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './img/')
+  },
+  filename: function (req, file, cb) {
+    crypto.pseudoRandomBytes(16, function (err, raw) {
+      cb(null, Date.now() + '.png');
+    });
+  }
+});
+
+var upload = multer({ storage: storage })
 // import initializeDb from './db';
 // import middleware from './middleware';
 // import api from './api';
@@ -40,7 +53,7 @@ app.get("/ajax/engagement", function(req,res){
 })
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
-   console.log(req.files)
+   console.log(req.file)
    console.log(req.body)
    res.send("done");
 });
