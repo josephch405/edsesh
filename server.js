@@ -17,12 +17,15 @@ var storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     crypto.pseudoRandomBytes(16, function (err, raw) {
-      cb(null, Date.now() + '.png');
+      cb(null, Date.now() + '.jpg');
     });
   }
 });
 
 var upload = multer({ storage: storage })
+
+let app = express();
+app.server = http.createServer(app);
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -39,6 +42,8 @@ app.get("/ajax/engagement", function(req,res){
 app.post('/img', upload.single('pic'), function (req, res, next) {
    console.log(req.file)
    console.log(req.body)
+   Faces.calc_attention("img/" + req.file)
+
    res.send("done");
 });
 
