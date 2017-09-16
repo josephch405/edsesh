@@ -30,8 +30,10 @@ var storage = multer.diskStorage({
 var icRoster = {};
 
 var engagement = 0;
+var distraction = 0;
 
 var upload = multer({ storage: storage })
+
 
 let app = express();
 app.server = http.createServer(app);
@@ -55,14 +57,17 @@ app.get("/ajax/engagement", function(req,res){
 })
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
-   //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
-   Faces.calc_attention("img/" + req.file.filename, updateEngagement)
-
+   Faces.calc_confusion("img/" + req.file.filename, updateEngagement)
+   Faces.calc_distraction("img/" + req.file.filename, 1, updateDistraction)
    res.send("done");
 });
 
 function updateEngagement(v){
 	engagement = v;
+}
+
+function updateDistraction(v){
+	distraction = v;
 }
 
 app.post('/help', function(req,res){
