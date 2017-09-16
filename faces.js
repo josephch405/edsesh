@@ -4,7 +4,6 @@ var client_face = new oxford.Client('0e44c5b59530422ca9d3c6597499689d');
 var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 // var client_getname = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 var client_emotion = new oxford.Client('f459d95e5a634e2b8536c48f2e82e41c');
-//var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 
 // means of engaged students
 const m_e_anger = 0.001266617;
@@ -32,11 +31,12 @@ const student_list = ['Mr. Yu','Miss Deng','Mr. Chuang','Miss Lin'];
 
 var Faces = {
     calc_confusion: function(img_path, cb) {
-        console.log("calc attention start")
+        console.log("calc confusion start")
         client_emotion.emotion.analyzeEmotion({
             path: img_path,
         }).then(function(response) {
-            console.log("calc attention cb")
+            var confusion_sum = 0;
+            console.log("calc confusion cb")
             // iterate over all faces in the image
             console.log("")
             for (var j = 0; j < response.length; j++) {
@@ -67,17 +67,14 @@ var Faces = {
                     diff_ue_disgust * diff_ue_disgust + diff_ue_fear * diff_ue_fear +
                     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
-                // engagement of the student
-                var engagement = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
-                console.log("Your attention level is:" + engagement);
-                cb(engagement);
+                // confusion of the student
+                var confusion = s/2 - s * Math.tanh(c * distance_ue);
+                console.log("The confusion level of the current student is:" + confusion);
+                confusion_sum += confusion
             }
+            cb(confusion_sum / response.length);            
         });
     },
-
-     // recognize_person: function(response){
-
-     // },
 
     calc_distraction: function(img_path, num_students, cb){
         console.log('calc distraction start');
@@ -87,27 +84,31 @@ var Faces = {
             returnFaceId: true
         }).then(function(response){
             console.log(response.length);
-            var face_arr = []
+            var faceId_arr = []
             for (var j = 0; j < response.length; j++){
-                face_arr.push(response[j].faceId)
+                faceId_arr.push(response[j].faceId)
                 console.log("Face Id: " + response[j].faceId);
             }
             client_recognize.face.identify(
                 face_arr,
-                'studet'    
+                'student'    
             ).then(function(response){
-                var personId = response[0].candidates.personId;
-                console.log(personId);
-                client_getname.face.person.get(
-                    'student', 
-                    personId
-                    ).then(function(response){
-                       console.log(response[0]);
-                })
+                for (var j = 0; j < response.length; j++){
+                    // get name of each face             
+                    var personId = response[j].candidates.personId;
+                    console.log("Person id: " + personId);
+                    client_getname.face.person.get(
+                        'student', 
+                        personId
+                        ).then(function(response){
+                           console.log(response[0]);
+                    })
+                }
             })
             console.log('calc distraction cb')
             var sum_distraction = 0;
             if (response.length < num_students) {
+                // account for students that are not detected by the API
                 sum_distraction += 10*(num_students - response.length);
             } else{ 
                 //iterate over all faces detected
@@ -124,8 +125,6 @@ var Faces = {
             cb(distraction);
         });
     },
-
-    
 
     prepare_emotion_data: function() {
         var writer = csvWriter({
