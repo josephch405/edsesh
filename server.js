@@ -11,6 +11,11 @@ const crypto = require('crypto')
 
 const Faces = require('./faces')
 
+var dir = './img';
+if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir);
+}
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './img/')
