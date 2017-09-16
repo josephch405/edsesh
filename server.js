@@ -23,6 +23,7 @@ var storage = multer.diskStorage({
 });
 
 var engagement = 0;
+var distraction = 0;
 
 var upload = multer({ storage: storage })
 
@@ -163,8 +164,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-Faces.calc_attention("imgs/confused-students/img-02.jpg")
-
 app.get("/teacher1", function(req, res){
 	res.sendFile('public/teacher1.html', {root: __dirname })
 })
@@ -178,14 +177,17 @@ app.get("/ajax/engagement", function(req,res){
 })
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
-   //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
-   Faces.calc_attention("img/" + req.file.filename, updateEngagement)
-
+   Faces.calc_confusion("img/" + req.file.filename, updateEngagement)
+   Faces.calc_distraction("img/" + req.file.filename, 1, updateDistraction)
    res.send("done");
 });
 
 function updateEngagement(v){
 	engagement = v;
+}
+
+function updateDistraction(v){
+	distraction = v;
 }
 
 app.post('/help', function(req,res){

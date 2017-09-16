@@ -37,7 +37,7 @@ var Faces = {
             console.log(response);
         });
     },
-    calc_attention: function(img_path, cb) {
+    calc_confusion: function(img_path, cb) {
         console.log("calc attention start")
         client_emotion.emotion.analyzeEmotion({
             path: img_path,
@@ -55,7 +55,6 @@ var Faces = {
                 var diff_e_neutral = response[j].scores.neutral - m_e_neutral;
                 var diff_e_sadness = response[j].scores.sadness - m_e_sadness;
                 var diff_e_surprise = response[j].scores.surprise - m_e_surprise;
-
                 // diff with mean of un-engaged student data
                 var diff_ue_anger = response[j].scores.anger - m_ue_anger;
                 var diff_ue_contempt = response[j].scores.contempt - m_ue_contempt;
@@ -65,7 +64,6 @@ var Faces = {
                 var diff_ue_neutral = response[j].scores.neutral - m_ue_neutral;
                 var diff_ue_sadness = response[j].scores.sadness - m_ue_sadness;
                 var diff_ue_surprise = response[j].scores.surprise - m_ue_surprise;
-
                 // sum of squares
                 var distance_e = diff_e_anger * diff_e_anger + diff_e_contempt * diff_e_contempt +
                     diff_e_disgust * diff_e_disgust + diff_e_fear * diff_e_fear +
@@ -75,14 +73,49 @@ var Faces = {
                     diff_ue_disgust * diff_ue_disgust + diff_ue_fear * diff_ue_fear +
                     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
-
+                // engagement of the student
                 var engagement = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
-
                 console.log("Your attention level is:" + engagement);
-                cb(engagement)
+                cb(engagement);
             }
         });
     },
+    calc_distraction: function(img_path, num_students, cb){
+        console.log('calc distraction start');
+        client_face.face.detect({
+            path: img_path,
+            analyzesHeadPose: true
+        }).then(function(response){
+            console.log('calc distraction cb')
+            var sum_distraction = 0;
+            if (response.length != num_students) {
+                sum_distraction += 10 * (num_students - response.length);
+            } else{ 
+                //iterate over all faces detected
+                for (var j = 0; j < response.length; j++){
+                    var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)
+                    var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)
+                    var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)
+                    var distance = 0;
+                    if (h_yaw > 10) {
+                        distance = distance + math.square((h_yaw - 10));
+                    }
+                    if (h_pitch > 10) {
+                        distance = distance + math.square((h_pitch - 10));
+                    }
+                    if (h_roll > 10) {
+                        distance = distance + math.square((h_roll));
+                    }
+                    sum_distraction += s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
+                    
+                }
+            }
+            var distraction = sum_distraction / num_students;
+            console.log("The class's distraction level is " + distraction);
+            cb(distraction);
+        });
+    },
+
     prepare_emotion_data: function() {
         var writer = csvWriter({
             headers: ["img", "anger", "contempt", "disgust", "fear", "happiness", "neutral", "sadness", "surprise"]
@@ -117,6 +150,5 @@ var Faces = {
         });
     }
 }
-
 
 module.exports = Faces;
