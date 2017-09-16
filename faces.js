@@ -55,7 +55,6 @@ var Faces = {
                 var diff_e_neutral = response[j].scores.neutral - m_e_neutral;
                 var diff_e_sadness = response[j].scores.sadness - m_e_sadness;
                 var diff_e_surprise = response[j].scores.surprise - m_e_surprise;
-
                 // diff with mean of un-engaged student data
                 var diff_ue_anger = response[j].scores.anger - m_ue_anger;
                 var diff_ue_contempt = response[j].scores.contempt - m_ue_contempt;
@@ -65,7 +64,6 @@ var Faces = {
                 var diff_ue_neutral = response[j].scores.neutral - m_ue_neutral;
                 var diff_ue_sadness = response[j].scores.sadness - m_ue_sadness;
                 var diff_ue_surprise = response[j].scores.surprise - m_ue_surprise;
-
                 // sum of squares
                 var distance_e = diff_e_anger * diff_e_anger + diff_e_contempt * diff_e_contempt +
                     diff_e_disgust * diff_e_disgust + diff_e_fear * diff_e_fear +
@@ -75,9 +73,8 @@ var Faces = {
                     diff_ue_disgust * diff_ue_disgust + diff_ue_fear * diff_ue_fear +
                     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
-
+                // engagement of the student
                 var engagement = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
-
                 console.log("Your attention level is:" + engagement);
                 cb(engagement)
             }
@@ -117,6 +114,5 @@ var Faces = {
         });
     }
 }
-
 
 module.exports = Faces;
