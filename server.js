@@ -9,7 +9,7 @@ const path = require('path')
 const multer  = require('multer')
 const crypto = require('crypto')
 
-const Faces = require('faces')
+const Faces = require('./faces')
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
