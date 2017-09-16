@@ -72,10 +72,14 @@
 			var blob = dataURItoBlob(data_uri)
 
 			var data = new FormData();
-			data.append('pic',blob)
-			$.post({
+
+			data.append('pic',blob, "image.png")
+			$.ajax({
+				type:"POST",
 				url: "/img",
-				data: data
+				data: data,
+				contentType: false,
+				processData: false
 			});
 		} );
 
