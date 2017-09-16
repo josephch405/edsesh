@@ -87,6 +87,7 @@ var Faces = {
         console.log('calc distraction start');
         client_face.face.detect({
             path: img_path,
+            analyzesHeadPose: true
         }).then(function(response){
             console.log('calc distraction cb')
             if (response.length == 0) {
@@ -109,7 +110,8 @@ var Faces = {
                     }
                     var distraction = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
 
-                    console.log()
+                    console.log("Your distraction level is " + distraction);
+                    cb(distraction)
                     }
                 }
             });
