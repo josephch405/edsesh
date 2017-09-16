@@ -93,21 +93,11 @@ var Faces = {
             } else{ 
                 //iterate over all faces detected
                 for (var j = 0; j < response.length; j++){
-                    var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)
-                    var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)
-                    var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)
-                    var distance = 0;
-                    if (h_yaw > 10) {
-                        distance = distance + math.square((h_yaw - 10));
-                    }
-                    if (h_pitch > 10) {
-                        distance = distance + math.square((h_pitch - 10));
-                    }
-                    if (h_roll > 10) {
-                        distance = distance + math.square((h_roll));
-                    }
-                    sum_distraction += s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
-                    
+                    var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)/90
+                    var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)/90
+                    var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)/90
+                    var distance = h_yaw * h_yaw + h_pitch * h_pitch + h_roll * h_roll;
+                    sum_distraction += s * Math.tanh(c * ((distance)))+ s/2;   
                 }
             }
             var distraction = sum_distraction / num_students;
