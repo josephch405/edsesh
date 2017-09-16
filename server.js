@@ -2,6 +2,7 @@ const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path')
 // import initializeDb from './db';
 // import middleware from './middleware';
 // import api from './api';
@@ -37,5 +38,7 @@ app.get("/student", function(req, res){
 app.get("/", function(req, res){
 	res.sendFile('public/index.html', {root: __dirname })
 })
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.listen(3000)
