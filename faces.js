@@ -1,7 +1,10 @@
 // start project oxford 
 var oxford = require('project-oxford');
-var client_face = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
+var client_face = new oxford.Client('0e44c5b59530422ca9d3c6597499689d');
+var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
+// var client_getname = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 var client_emotion = new oxford.Client('f459d95e5a634e2b8536c48f2e82e41c');
+//var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 
 // means of engaged students
 const m_e_anger = 0.001266617;
@@ -25,18 +28,9 @@ const m_ue_surprise = 0.00696194;
 const s = 10
 const c = 5
 
+const student_list = ['Mr. Yu','Miss Deng','Mr. Chuang','Miss Lin'];
+
 var Faces = {
-    faceTest: function() {
-        // detect face
-        client_face.face.detect({
-            path: 'oba.jpg',
-            analyzesAge: true,
-            analyzesGender: true,
-            analyzesHeadPose: true
-        }).then(function(response) {
-            console.log(response);
-        });
-    },
     calc_confusion: function(img_path, cb) {
         console.log("calc attention start")
         client_emotion.emotion.analyzeEmotion({
@@ -80,24 +74,49 @@ var Faces = {
             }
         });
     },
+
+     // recognize_person: function(response){
+
+     // },
+
     calc_distraction: function(img_path, num_students, cb){
         console.log('calc distraction start');
         client_face.face.detect({
             path: img_path,
-            analyzesHeadPose: true
+            analyzesHeadPose: true,
+            returnFaceId: true
         }).then(function(response){
+            console.log(response.length);
+            var face_arr = []
+            for (var j = 0; j < response.length; j++){
+                face_arr.push(response[j].faceId)
+                console.log("Face Id: " + response[j].faceId);
+            }
+            client_recognize.face.identify(
+                face_arr,
+                'studet'    
+            ).then(function(response){
+                var personId = response[0].candidates.personId;
+                console.log(personId);
+                client_getname.face.person.get(
+                    'student', 
+                    personId
+                    ).then(function(response){
+                       console.log(response[0]);
+                })
+            })
             console.log('calc distraction cb')
             var sum_distraction = 0;
-            if (response.length != num_students) {
-                sum_distraction += 10 * (num_students - response.length);
+            if (response.length < num_students) {
+                sum_distraction += 10*(num_students - response.length);
             } else{ 
                 //iterate over all faces detected
                 for (var j = 0; j < response.length; j++){
-                    var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)/90
-                    var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)/90
-                    var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)/90
+                    var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)/50
+                    var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)/50
+                    var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)/50
                     var distance = h_yaw * h_yaw + h_pitch * h_pitch + h_roll * h_roll;
-                    sum_distraction += s * Math.tanh(c * ((distance)))+ s/2;   
+                    sum_distraction += s * Math.tanh(c * ((distance)))+ s / 2;   
                 }
             }
             var distraction = sum_distraction / num_students;
@@ -105,6 +124,8 @@ var Faces = {
             cb(distraction);
         });
     },
+
+    
 
     prepare_emotion_data: function() {
         var writer = csvWriter({
