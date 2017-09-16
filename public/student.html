@@ -3,33 +3,64 @@
 <head>
     <link rel="stylesheet" href="chartist.min.css">
     <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="main.less">
 </head>
 
 <body>
-    <div class="col-xs-12 col-md-8 col-md-offset-2">
-<br />
-      <div>
-          <input type="button" id = "panicButton" class="btn btn-info btn-lg" value="PANIC!"
-          onclick = 'submitPanic()'>
-      </div>
+    <div id="studentModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Engag-Ed Student Login</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col-xs-5 col-xs-offset-1">
+                            <input type="text" class="form-control" id="firstName" placeholder="First Name">
+                        </div>
+                        <div class="col-xs-5">
+                            <input type="text" class="form-control" id="lastName" placeholder="Last Name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xs-6 col-xs-offset-3">
+                            <input type="text" class="form-control" id="studentId" placeholder="Student Id">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="button">
+                        <button type="button" data-dismiss="modal">Login</button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
     </div>
-
+    <!-- /.modal -->
+    <div id="student" class="col-xs-12 col-md-8 col-md-offset-2">
+        <br />
+            <input class = "button" type="button" id="panicButton" value="HELP" onclick='submitPanic()'>
+    </div>
     <script src="jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="chartist.min.js"></script>
 </body>
 <script>
-function submitPanic(){
-  console.log(document.getElementById("panicButton").value)
-  $.ajax({
-    type: "POST",
-    url:'/help',
-    data: document.getElementById("panicButton").value
-  })
+function submitPanic() {
+    console.log(document.getElementById("panicButton").value)
+    $.ajax({
+        type: "POST",
+        url: '/help',
+        data: document.getElementById("panicButton").value
+    })
 
 }
+$("#studentModal").modal({
+    backdrop: 'static',
+    keyboard: false
+})
 </script>
-
-
 
 </html>
