@@ -68,9 +68,9 @@ var Faces = {
                     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
                 // engagement of the student
-                var engagement = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
-                console.log("Your attention level is:" + engagement);
-                cb(engagement);
+                var confusion = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
+                console.log("Your attention level is:" + confusion);
+                cb(confusion);
             }
         });
     },
