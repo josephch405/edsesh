@@ -56,6 +56,8 @@ app.get("/ajax/confusion", function(req,res){
 	res.send(200, confusion)
 })
 
+var num_students = 1;
+
 app.post('/img', upload.single('pic'), function (req, res, next) {
    Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
    Faces.calc_distraction("img/" + req.file.filename, 1, updateDistraction)
