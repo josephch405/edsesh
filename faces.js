@@ -83,6 +83,35 @@ var Faces = {
             }
         });
     },
+    calc_distraction = function(img_path, cb){
+        console.log('calc distraction start');
+            path: img_path,
+        }).then(function(response){
+            console.log('calc distraction cb')
+            if (response.length == 0) {
+                var distraction = 10
+            } else{ 
+                for (var j = 0; j < response.length; j++){
+                    var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)
+                    var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)
+                    var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)
+                    var distance = 0;
+                    if (h_yaw > 10) {
+                        distance = distance + math.square((h_yaw - 10));
+                    }
+                    if (h_pitch > 10) {
+                        distance = distance + math.square((h_pitch - 10));
+                    }
+                    if (h_roll > 10) {
+                        distance = distance + math.square((h_roll));
+                    }
+                    var distraction = s * Math.tanh() 
+                    console.log(h_yaw + ', ' + h_pitch + ', ' + h_roll);
+                    }
+                }
+            });
+    },
+
     prepare_emotion_data: function() {
         var writer = csvWriter({
             headers: ["img", "anger", "contempt", "disgust", "fear", "happiness", "neutral", "sadness", "surprise"]
