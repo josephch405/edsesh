@@ -37,7 +37,7 @@ var Faces = {
             console.log(response);
         });
     },
-    calc_attention: function(img_path, cb) {
+    calc_confusion: function(img_path, cb) {
         console.log("calc attention start")
         client_emotion.emotion.analyzeEmotion({
             path: img_path,
@@ -76,19 +76,20 @@ var Faces = {
                 // engagement of the student
                 var engagement = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
                 console.log("Your attention level is:" + engagement);
-                cb(engagement)
+                cb(engagement);
             }
         });
     },
-    calc_distraction = function(img_path, cb){
+    calc_distraction: function(img_path, num_students, cb){
         console.log('calc distraction start');
         client_face.face.detect({
             path: img_path,
             analyzesHeadPose: true
         }).then(function(response){
             console.log('calc distraction cb')
-            if (response.length == 0) {
-                var distraction = 10
+            var sum_distraction = 0;
+            if (response.length != num_students) {
+                sum_distraction += 10 * (num_students - response.length);
             } else{ 
                 //iterate over all faces detected
                 for (var j = 0; j < response.length; j++){
@@ -105,13 +106,14 @@ var Faces = {
                     if (h_roll > 10) {
                         distance = distance + math.square((h_roll));
                     }
-                    var distraction = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
-
-                    console.log("Your distraction level is " + distraction);
-                    cb(distraction)
-                    }
+                    sum_distraction += s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
+                    
                 }
-            });
+            }
+            var distraction = sum_distraction / num_students;
+            console.log("The class's distraction level is " + distraction);
+            cb(distraction);
+        });
     },
 
     prepare_emotion_data: function() {
