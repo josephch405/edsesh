@@ -82,12 +82,14 @@ var Faces = {
     },
     calc_distraction = function(img_path, cb){
         console.log('calc distraction start');
+        client_face.face.detect({
             path: img_path,
         }).then(function(response){
             console.log('calc distraction cb')
             if (response.length == 0) {
                 var distraction = 10
             } else{ 
+                //iterate over all faces detected
                 for (var j = 0; j < response.length; j++){
                     var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)
                     var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)
@@ -102,8 +104,9 @@ var Faces = {
                     if (h_roll > 10) {
                         distance = distance + math.square((h_roll));
                     }
-                    var distraction = s * Math.tanh() 
-                    console.log(h_yaw + ', ' + h_pitch + ', ' + h_roll);
+                    var distraction = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
+
+                    console.log()
                     }
                 }
             });
