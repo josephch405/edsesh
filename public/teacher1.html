@@ -42,24 +42,24 @@
 	<!-- Code to handle taking the snapshot and displaying it locally -->
 	<script language="JavaScript">
 
-	function binEncode(data) {
-	    var binArray = []
-	    var datEncode = "";
+	function dataURItoBlob(dataURI) {
+	    // convert base64/URLEncoded data component to raw binary data held in a string
+	    var byteString;
+	    if (dataURI.split(',')[0].indexOf('base64') >= 0)
+	        byteString = atob(dataURI.split(',')[1]);
+	    else
+	        byteString = unescape(dataURI.split(',')[1]);
 
-	    for (i=0; i < data.length; i++) {
-	        binArray.push(data[i].charCodeAt(0).toString(2));
+	    // separate out the mime component
+	    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+	    // write the bytes of the string to a typed array
+	    var ia = new Uint8Array(byteString.length);
+	    for (var i = 0; i < byteString.length; i++) {
+	        ia[i] = byteString.charCodeAt(i);
 	    }
-	    for (j=0; j < binArray.length; j++) {
-	        var pad = padding_left(binArray[j], '0', 8);
-	        datEncode += pad + ' ';
-	    }
-	    function padding_left(s, c, n) { if (! s || ! c || s.length >= n) {
-	        return s;
-	    }
-	    var max = (n - s.length)/c.length;
-	    for (var i = 0; i < max; i++) {
-	        s = c + s; } return s;
-	    }
+
+	    return new Blob([ia], {type:mimeString});
 	}
 
 	setInterval(function(){
@@ -69,15 +69,13 @@
 				'<h2>Here is your image:</h2>' +
 				'<img src="'+data_uri+'"/>';
 
-			var blob = new Blob([binEncode(data_uri), {type: "image/jpeg"}])
+			var blob = dataURItoBlob(data_uri)
 
 			var data = new FormData();
 			data.append('pic',blob)
 			$.post({
 				url: "/img",
-				data: data,
-				contentType: false,
-				processData: false
+				data: data
 			});
 		} );
 
