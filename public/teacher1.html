@@ -1,5 +1,6 @@
-<html>
 
+
+<html lang="en">
 <head>
     <link rel="stylesheet" href="chartist.min.css">
     <link rel="stylesheet" href="bootstrap.min.css">
@@ -7,13 +8,75 @@
 
 <body>
     <div class="col-xs-12 col-md-8 col-md-offset-2">
-    	
+
     </div>
 
     <script src="jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="chartist.min.js"></script>
-    <script src="teacher2.js"></script>
 </body>
 
+	<h1>Teacher 1 Page</h1>
+	<h3>Capture image of class</h3>
+
+	<div id="my_camera"></div>
+
+	<!-- First, include the Webcam.js JavaScript Library -->
+	<script type="text/javascript" src="webcam.js"></script>
+
+	<!-- Configure a few settings and attach camera -->
+	<script language="JavaScript">
+		Webcam.set({
+			width: 640,
+			height: 480,
+			image_format: 'jpeg',
+			jpeg_quality: 100
+		});
+		Webcam.attach( '#my_camera' );
+	</script>
+
+	<div id="results"></div>
+
+
+	<!-- loop for getting webcam images every 3 seconds -->
+	<!-- Code to handle taking the snapshot and displaying it locally -->
+	<script language="JavaScript">
+
+	function binEncode(data) {
+	    var binArray = []
+	    var datEncode = "";
+
+	    for (i=0; i < data.length; i++) {
+	        binArray.push(data[i].charCodeAt(0).toString(2));
+	    }
+	    for (j=0; j < binArray.length; j++) {
+	        var pad = padding_left(binArray[j], '0', 8);
+	        datEncode += pad + ' ';
+	    }
+	    function padding_left(s, c, n) { if (! s || ! c || s.length >= n) {
+	        return s;
+	    }
+	    var max = (n - s.length)/c.length;
+	    for (var i = 0; i < max; i++) {
+	        s = c + s; } return s;
+	    }
+	    console.log(binArray);
+	}
+
+	setInterval(function(){
+		Webcam.snap( function(data_uri) {
+			// display results in page
+			document.getElementById('results').innerHTML =
+				'<h2>Here is your image:</h2>' +
+				'<img src="'+data_uri+'"/>';
+
+			var blob = new Blob([binEncode(data_uri), {type: "image/jpeg"}])
+			$.post("/img", {pic: binEncode(data_uri)})
+		} );
+
+	}, 3000);
+
+	</script>
+
+</body>
 </html>
