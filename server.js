@@ -22,8 +22,20 @@ app.use(bodyParser.json({
 	limit : 10000
 }));
 
+app.get("/teacher1", function(req, res){
+	res.sendFile('public/teacher1.html', {root: __dirname })
+})
+
+app.get("/teacher2", function(req, res){
+	res.sendFile('public/teacher2.html', {root: __dirname })
+})
+
+app.get("/student", function(req, res){
+	res.sendFile('public/student.html', {root: __dirname })
+})
+
 app.get("/", function(req, res){
-	res.send("hi");
+	res.sendFile('public/index.html', {root: __dirname })
 })
 
 app.listen(3000)
