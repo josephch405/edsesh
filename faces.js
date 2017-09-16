@@ -67,7 +67,7 @@ var Faces = {
                     diff_ue_disgust * diff_ue_disgust + diff_ue_fear * diff_ue_fear +
                     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
-                // engagement of the student
+                // confusion of the student
                 var confusion = s/2 - s * Math.tanh(c * distance_ue);
                 console.log("The confusion level of the current student is:" + confusion);
                 confusion_sum += confusion
@@ -95,7 +95,7 @@ var Faces = {
             ).then(function(response){
                 for (var j = 0; j < response.length; j++){
                     // get name of each face             
-                    var personId = response[0].candidates.personId;
+                    var personId = response[j].candidates.personId;
                     console.log("Person id: " + personId);
                     client_getname.face.person.get(
                         'student', 
