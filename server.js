@@ -74,6 +74,7 @@ app.get("/teacher3", function(req, res){
 
 app.get("/ajax/confusion", function(req,res){
 	res.send(200, confusion)
+
 })
 
 app.get("/ajax/distraction", function(req,res){
@@ -81,9 +82,11 @@ app.get("/ajax/distraction", function(req,res){
 })
 
 
+
 function updateEngagement(v){
 	engagement = v;
 }
+
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
    //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
@@ -97,6 +100,7 @@ app.post('/img', upload.single('pic'), function (req, res, next) {
    })
    res.send("done");
 });
+
 
 function updateConfusion(v){
 	confusion = v;
