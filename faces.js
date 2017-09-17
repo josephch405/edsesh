@@ -102,7 +102,7 @@ var Faces = {
                 // var val_pitch = response[j].faceAttributes.headPose.pitch;
                 // var val_roll = response[j].faceAttributes.headPose.roll;
                 var h_yaw = Math.abs(Math.sin(val_yaw * 4 / 180 * 3.14))
-                sum_distraction += s * h_yaw;   
+                sum_distraction += s * h_yaw;
             }
             var distraction = 0;
             if (response.length != 0){

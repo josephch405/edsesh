@@ -46,6 +46,7 @@ var icRoster = {};
 var helpRoster = {};
 var confusion = 0;
 var distraction = 0;
+var users = [];
 
 var upload = multer({ storage: storage })
 
@@ -78,6 +79,12 @@ app.get("/teacher2", function(req, res) {
 app.get("/teacher3", function(req, res) {
     res.sendFile('public/teacher3.html', { root: __dirname })
 })
+
+
+app.get("/teacher4", function(req, res) {
+    res.sendFile('public/teacher4.html', { root: __dirname })
+})
+
 
 app.get("/getData", function(req, res) {
     Emotions.find({}, function(err, sessions) {
