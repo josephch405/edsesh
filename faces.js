@@ -72,7 +72,7 @@ var Faces = {
                 // confusion of the student
                 var emotion_average = (0.5 * diff_e_anger + 0.5 * diff_e_fear + 2 * diff_e_surprise) / 3;
                 var confusion = s * Math.tanh(c * 40 * emotion_average) + 1;
-                console.log("The confusion level of student #" + j + "is:" + confusion);
+                console.log("The confusion level of student #" + j + " is:" + confusion);
                 confusion_sum += confusion;
             }
             cb(confusion_sum / response.length);
@@ -91,10 +91,6 @@ var Faces = {
             console.log('calc distraction cb')
             var sum_distraction = 0;
             console.log("response length: " + response.length)
-            // if (response.length < num_students) {
-            //     // account for students that are not detected by the API
-            //     sum_distraction += 10*(num_students - response.length);
-            // }
             //iterate over all faces detected
             for (var j = 0; j < response.length; j++){
                 var val_yaw = response[j].faceAttributes.headPose.yaw;
@@ -122,12 +118,21 @@ var Faces = {
             var faceId_arr = []
             if (response.length == 0){
                 cb(faceId_arr);
+                return;
             }
             for (var j = 0; j < response.length; j++){
                 faceId_arr.push(response[j].faceId)
                 console.log("Face Id: " + response[j].faceId);
             }
-            client_recognize.face.identify(
+            console.log(Faces.match_face_by_arr(faceId_arr));
+            cb(Faces.match_face_by_arr(faceId_arr));
+            }).catch(function(err){
+                console.log("match face err:", err)
+            })
+    },
+
+    match_face_by_arr: function(faceId_arr){
+        client_recognize.face.identify(
                faceId_arr,
                'student'
             ).then(function(response_recog){
@@ -145,11 +150,9 @@ var Faces = {
                         }
                     }
                 }
-                cb(identified_names);
-            }).catch(function(err){
-                console.log("distraction err:", err)
+                console.log(identified_names);
+                return identified_names;
             })
-        });
     },
 
     prepare_emotion_data: function() {
@@ -186,6 +189,5 @@ var Faces = {
         });
     }
 }
-
 
 module.exports = Faces;
