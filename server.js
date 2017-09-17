@@ -79,7 +79,7 @@ function updateDistraction(v){
 }
 
 app.post("/nextSlide", function(req,res){
-  helpctr = 0;\
+  helpctr = 0;
   res.send("sent");
 })
 
