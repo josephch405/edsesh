@@ -48,6 +48,7 @@ var helpctr = 0;
 
 var confusion = 0;
 var distraction = 0;
+var name = [];
 
 var upload = multer({ storage: storage })
 
@@ -96,6 +97,8 @@ app.post('/img', upload.single('pic'), function (req, res, next) {
    //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
    Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
    Faces.calc_distraction("img/" + req.file.filename, updateDistraction)
+   Faces.match_face("img/" + req.file.filename, updatePersonName)
+
    var s = Emotions.findOne({session: sessionNumber}, function(err, emotion){
      console.log(emotion)
      emotion.confusion.push({date: Date.now(), level: 1})
@@ -112,6 +115,10 @@ function updateConfusion(v){
 
 function updateDistraction(v){
 	distraction = distraction / 2 + v / 2;
+}
+
+function updatePersonName(arr_names){
+	name = arr_names;
 }
 
 app.post("/nextSlide", function(req,res){
