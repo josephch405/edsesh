@@ -36,10 +36,7 @@ var Faces = {
         client_emotion.emotion.analyzeEmotion({
             path: img_path,
         }).then(function(response) {
-<<<<<<< HEAD
-=======
             var confusion_sum = 0;
->>>>>>> master
             console.log("calc confusion cb")
             // iterate over all faces in the image
             console.log("")
@@ -71,18 +68,10 @@ var Faces = {
                     diff_ue_disgust * diff_ue_disgust + diff_ue_fear * diff_ue_fear +
                     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
-<<<<<<< HEAD
-                // engagement of the student
-                var confusion = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
-                console.log("Your confusion level is:" + confusion);
-                cb(confusion);
-=======
-
                 // confusion of the student
                 var confusion = s/2 - s * Math.tanh(c * distance_ue);
                 console.log("The confusion level of the current student is:" + confusion);
                 confusion_sum += confusion
->>>>>>> master
             }
             cb(confusion_sum / response.length);            
         });
