@@ -55,6 +55,13 @@ var chart = new Chart(ctx, {
             display: true,
             position: "top",
             text: "Session " + getDateName()
+        },
+        scales:{
+          xAxes:[{
+            ticks:{
+              maxTicksLimit:8
+            }
+          }]
         }
     }
 });
