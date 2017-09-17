@@ -14,7 +14,7 @@ const Faces = require('./faces')
 var dir = './img';
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
-
+}
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -49,18 +49,34 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.get("/teacher1", function(req, res){
-	res.sendFile('public/teacher1.html', {root: __dirname })
-
+  sessionNumber = new Date().getTime();
+  var s = new Emotions({
+    session: sessionNumber,
+    confusion: [],
+    distraction: []
+  });
+  s.save(function(){
+    res.sendFile('public/teacher1.html', {root: __dirname })
+  });
 })
 
 app.get("/teacher2", function(req, res){
 	res.sendFile('public/teacher2.html', {root: __dirname })
 })
 
+app.get("/teacher3", function(req, res){
+  var sessions = Emotions.distinct("session")
+  console.log(sessions)
+	res.sendFile('public/teacher3.html', {root: __dirname })
+})
+
 app.get("/ajax/confusion", function(req,res){
 	res.send(200, confusion)
 })
 
+app.get("/ajax/distraction", function(req,res){
+	res.send(200, distraction)
+})
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
    //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
@@ -83,7 +99,7 @@ function updateDistraction(v){
 }
 
 app.post("/nextSlide", function(req,res){
-  helpctr = 0;\
+  helpctr = 0;
   res.send("sent");
 })
 
