@@ -75,17 +75,17 @@ app.get("/teacher2", function(req, res) {
     res.sendFile('public/teacher2.html', { root: __dirname })
 })
 
-app.get("/teacher3", function(req, res){
-  	res.sendFile('public/teacher3.html', {root: __dirname })
-  })
+app.get("/teacher3", function(req, res) {
+    res.sendFile('public/teacher3.html', { root: __dirname })
+})
 
-app.get("/getData", function(req,res){
-    Emotions.find({}, function(err, sessions){
+app.get("/getData", function(req, res) {
+    Emotions.find({}, function(err, sessions) {
         var seshList = []
-      for(var i in sessions){
-        seshList.push(sessions[i].session)
-      }
-      res.send(200, seshList)
+        for (var i in sessions) {
+            seshList.push(sessions[i].session)
+        }
+        res.send(200, seshList)
     })
 })
 
@@ -98,8 +98,8 @@ app.get("/ajax/distraction", function(req, res) {
     res.send(200, distraction)
 })
 
-function updateEngagement(v){
-	engagement = v;
+function updateEngagement(v) {
+    engagement = v;
 }
 
 app.post('/img', upload.single('pic'), function(req, res, next) {
@@ -125,44 +125,45 @@ function updateDistraction(v) {
 }
 
 app.post("/nextSlide", function(req, res) {
-	helpRoster = {};
+    helpRoster = {};
     res.send("sent");
 })
 
-app.post("/getChartData", function(req,res){
-  //console.log(req.body.data)
-  Emotions.findOne({'session': req.body.session}, function(err, sessions){
-  //  console.log(sessions)
-  //  console.log(sessions.confusion)
-  //console.log([sessions.confusion, sessions.distraction])
-    res.send(200, [sessions.distraction,sessions.confusion])
-  })
+app.post("/getChartData", function(req, res) {
+    //console.log(req.body.data)
+    Emotions.findOne({ 'session': req.body.session }, function(err, sessions) {
+        //  console.log(sessions)
+        //  console.log(sessions.confusion)
+        //console.log([sessions.confusion, sessions.distraction])
+        res.send(200, [sessions.distraction, sessions.confusion])
+    })
 })
 
 
-app.post('/ic', function(req, res){
-	icRoster[req.body.userId] = req.body.n;
+app.post('/ic', function(req, res) {
+    icRoster[req.body.userId] = req.body.n;
+})
 
 app.post('/help', function(req, res) {
     helpRoster[req.body.userId] = 10;
     res.send(200);
 });
 
-function distillRoster(){
-	var a = [];
-	for(var i in helpRoster){
-		a.push(helpRoster[i])
-	}
-	a.sort(function(a, b){return b-a});
-	return a;
+function distillRoster() {
+    var a = [];
+    for (var i in helpRoster) {
+        a.push(helpRoster[i])
+    }
+    a.sort(function(a, b) { return b - a });
+    return a;
 }
 
 app.get('/checkHelp', function(req, res) {
     var newRoster = {};
-	for(var i in helpRoster){
+    for (var i in helpRoster) {
         if (helpRoster[i] > 0)
-		  newRoster[i] = helpRoster[i] - 1
-	}
+            newRoster[i] = helpRoster[i] - 1
+    }
     helpRoster = newRoster
     res.send(distillRoster());
 })
