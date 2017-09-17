@@ -1,40 +1,49 @@
 const http = require('http');
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const csvWriter = require('csv-write-stream');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
-const path = require('path')
-const multer  = require('multer')
-const crypto = require('crypto')
+const multer = require('multer')
 
 const Faces = require('./faces')
 
 const Emotions = require('./db')
 
+// FILESYSTEM INITIALIZATION
 var dir = './img';
-if (!fs.existsSync(dir)){
+if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
 }
 
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './img/')
-  },
-  filename: function (req, file, cb) {
-    crypto.pseudoRandomBytes(16, function (err, raw) {
-      cb(null, Date.now() + '.jpg');
-    });
-  }
+const directory = 'img';
+
+fs.readdir(directory, (err, files) => {
+    if (err) throw error;
+
+    for (const file of files) {
+        fs.unlink(path.join(directory, file), err => {
+            if (err) throw error;
+        });
+    }
 });
+
+var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './img/')
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now() + '.jpg');
+    }
+});
+
+// END OF FILESYSTEM STUFF
 
 var engagement = 0;
 var sessionNumber = 0;
 var icRoster = {};
-var helpRequests = false;
-var helpctr = 0;
-
+var helpRoster = {};
 var confusion = 0;
 var distraction = 0;
 
@@ -50,22 +59,23 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.get("/teacher1", function(req, res){
-  sessionNumber = new Date().getTime();
-  var s = new Emotions({
-    session: sessionNumber,
-    confusion: [],
-    distraction: []
-  });
-  s.save(function(){
-    res.sendFile('public/teacher1.html', {root: __dirname })
-  });
+app.get("/teacher1", function(req, res) {
+    sessionNumber = new Date().getTime();
+    var s = new Emotions({
+        session: sessionNumber,
+        confusion: [],
+        distraction: []
+    });
+    s.save(function() {
+        res.sendFile('public/teacher1.html', { root: __dirname })
+    });
 })
 
-app.get("/teacher2", function(req, res){
-	res.sendFile('public/teacher2.html', {root: __dirname })
+app.get("/teacher2", function(req, res) {
+    res.sendFile('public/teacher2.html', { root: __dirname })
 })
 
+<<<<<<< HEAD
 app.get("/teacher3", function(req, res){
   	res.sendFile('public/teacher3.html', {root: __dirname })
   })
@@ -78,15 +88,21 @@ app.get("/getData", function(req,res){
       }
       res.send(200, seshList)
     })
+=======
+app.get("/teacher3", function(req, res) {
+    var sessions = Emotions.distinct("session")
+    console.log(sessions)
+    res.sendFile('public/teacher3.html', { root: __dirname })
+>>>>>>> 1547a1455204860c901f2760b841ebd503c88f01
 })
 
-app.get("/ajax/confusion", function(req,res){
-	res.send(200, confusion)
+app.get("/ajax/confusion", function(req, res) {
+    res.send(200, confusion)
 
 })
 
-app.get("/ajax/distraction", function(req,res){
-	res.send(200, distraction)
+app.get("/ajax/distraction", function(req, res) {
+    res.send(200, distraction)
 })
 
 function updateEngagement(v){
@@ -110,13 +126,13 @@ function updateConfusion(v){
 	confusion = v;
 }
 
-function updateDistraction(v){
-	distraction = v;
+function updateDistraction(v) {
+    distraction = distraction / 2 + v / 2;
 }
 
-app.post("/nextSlide", function(req,res){
-  helpctr = 0;
-  res.send("sent");
+app.post("/nextSlide", function(req, res) {
+	helpRoster = {};
+    res.send("sent");
 })
 
 app.post("/getChartData", function(req,res){
@@ -129,44 +145,57 @@ app.post("/getChartData", function(req,res){
   })
 })
 
-app.post('/help', function(req,res){
-	//console.log(req.body)
-  helpctr +=1;
-	res.send("HELP");
-});
-
-app.get('/checkHelp', function (req,res){
-  if (helpctr >= 2){
-    res.send(true)
-  }
-  else{
-    res.send(false)
-  }
-})
 
 app.post('/ic', function(req, res){
 	icRoster[req.body.userId] = req.body.n;
-})
 
-app.get('/ic/list', function(req, res){
-	var c = [0, 0, 0, 0];
-	for(var p in icRoster){
-		c[icRoster[p]] += 1;
+app.post('/help', function(req, res) {
+    helpRoster[req.body.userId] = 10;
+    res.send(200);
+});
+
+function distillRoster(){
+	var a = [];
+	for(var i in helpRoster){
+		a.push(helpRoster[i])
 	}
-	res.send(c)
+	a.sort(function(a, b){return b-a});
+	return a;
+}
+
+app.get('/checkHelp', function(req, res) {
+    var newRoster = {};
+	for(var i in helpRoster){
+        if (helpRoster[i] > 0)
+		  newRoster[i] = helpRoster[i] - 1
+	}
+    helpRoster = newRoster
+    res.send(distillRoster());
 })
 
-app.get('/ic/new', function(req, res){
-	icRoster = {};
-	res.send([0, 0, 0, 0])
+app.post('/ic', function(req, res) {
+    icRoster[req.body.userId] = req.body.n;
 })
 
-app.get("/student", function(req, res){
-	res.sendFile('public/student.html', {root: __dirname })
+app.get('/ic/list', function(req, res) {
+    var c = [0, 0, 0, 0];
+    for (var p in icRoster) {
+        c[icRoster[p]] += 1;
+    }
+    res.send(c)
 })
 
-app.get("/", function(req, res){
-	res.sendFile('public/index.html', {root: __dirname })
+app.get('/ic/new', function(req, res) {
+    icRoster = {};
+    res.send([0, 0, 0, 0])
+})
+
+app.get("/student", function(req, res) {
+    res.sendFile('public/student.html', { root: __dirname })
+})
+
+app.get("/", function(req, res) {
+    res.sendFile('public/index.html', { root: __dirname })
 })
 
 app.use(express.static(path.join(__dirname, 'public')));
