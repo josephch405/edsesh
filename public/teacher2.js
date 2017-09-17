@@ -73,13 +73,16 @@ var up = function() {
         chart.update();
     })
 }
+
 setInterval(up, 1000)
 
 var checkHelp = function() {
-    $.get("/checkHelp", function(status) {
-        if (status){
-          on();
+    $.get("/checkHelp", function(list) {
+        $("#helpbox").html("")
+        for(var i in list){
+            $("#helpbox").append("<div class = 'hbox hbox-" + list[i] + "'></div>")
         }
+        console.log(list)
     })
 }
 
