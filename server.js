@@ -108,9 +108,11 @@ app.post('/img', upload.single('pic'), function(req, res, next) {
     Faces.calc_distraction("img/" + req.file.filename, updateDistraction)
     var s = Emotions.findOne({ session: sessionNumber }, function(err, emotion) {
         console.log(emotion)
-        emotion.confusion.push({ date: Date.now(), level: confusion })
-        emotion.distraction.push({ date: Date.now(), level: distraction })
-        emotion.save()
+        if(emotion){
+            emotion.confusion.push({ date: Date.now(), level: confusion })
+            emotion.distraction.push({ date: Date.now(), level: distraction })
+            emotion.save()
+        }
     })
     res.send("done");
 });

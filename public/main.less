@@ -82,8 +82,8 @@
 	padding-left: 5vw;
 }
 
-#bottomBar a:hover{
-	text-decoration: none;
+#bottomBar *{
+	text-decoration: none !important;
 }
 
 .button{
@@ -102,6 +102,16 @@
 	// margin-right: 2vh;
 	font-size: 2vh;
 	transition: all 0.1s ease-out;
+}
+
+.button:hover{
+	background-color: #FFB334;
+	box-shadow: 0 0 3vh 0 rgba(0,0,0,.3);
+}
+
+.button:active{
+	background-color: #ffad23;
+	box-shadow: 0 0 0vh 0 rgba(0,0,0,0);
 }
 
 .button input, .button button, .sButton, button{
