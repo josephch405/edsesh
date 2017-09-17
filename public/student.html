@@ -54,11 +54,11 @@
 <script>
   var userId = Math.floor(Math.random() * 2000000);
 function submitPanic() {
-    console.log(document.getElementById("panicButton").value)
+    console.log(document.getElementById("help").value)
     $.ajax({
         type: "POST",
         url: '/help',
-        data: document.getElementById("panicButton").value
+        data: document.getElementById("help").value
     })
 }
 function ic(n){

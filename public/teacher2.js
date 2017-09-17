@@ -1,6 +1,6 @@
 var students = {
     series: [
-        [0], 
+        [0],
         [0]
     ]
 };
@@ -73,6 +73,26 @@ var up = function() {
         chart.update();
     })
 }
-
-
 setInterval(up, 3000)
+
+var checkHelp = function() {
+    $.get("/checkHelp", function(status) {
+        if (status){
+          on();
+        }
+    })
+}
+setInterval(checkHelp, 1000)
+
+function on() {
+    document.getElementById("overlay").style.display = "block";
+}
+
+function off() {
+    document.getElementById("overlay").style.display = "none";
+    $.ajax({
+      type: "POST",
+      url: "nextSlide",
+      data: 0
+    });
+}

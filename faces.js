@@ -1,4 +1,4 @@
-// start project oxford 
+// start project oxford
 var oxford = require('project-oxford');
 var client_face = new oxford.Client('0e44c5b59530422ca9d3c6597499689d');
 var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
@@ -73,7 +73,7 @@ var Faces = {
                 console.log("The confusion level of the current student is:" + confusion);
                 confusion_sum += confusion
             }
-            cb(confusion_sum / response.length);            
+            cb(confusion_sum / response.length);
         });
     },
 
@@ -92,14 +92,14 @@ var Faces = {
             }
             client_recognize.face.identify(
                 faceId_arr,
-                'student'    
+                'student'
             ).then(function(response){
                 for (var j = 0; j < response.length; j++){
-                    // get name of each face             
+                    // get name of each face
                     var personId = response[j].candidates.personId;
                     console.log("Person id: " + personId);
                     client_getname.face.person.get(
-                        'student', 
+                        'student',
                         personId
                         ).then(function(response){
                            console.log(response[0]);
@@ -111,14 +111,14 @@ var Faces = {
             if (response.length < num_students) {
                 // account for students that are not detected by the API
                 sum_distraction += 10*(num_students - response.length);
-            } else{ 
+            } else{
                 //iterate over all faces detected
                 for (var j = 0; j < response.length; j++){
                     var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)/50
                     var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)/50
                     var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)/50
                     var distance = h_yaw * h_yaw + h_pitch * h_pitch + h_roll * h_roll;
-                    sum_distraction += s * Math.tanh(c * ((distance)))+ s / 2;   
+                    sum_distraction += s * Math.tanh(c * ((distance)))+ s / 2;
                 }
             }
             var distraction = sum_distraction / num_students;
