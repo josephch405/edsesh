@@ -2,7 +2,6 @@
   "dependencies": {
     "body-parser": "^1.18.1",
     "cors": "^2.8.4",
-    "crypto": "^1.0.1",
     "csv-write-stream": "^2.0.0",
     "express": "^4.15.4",
     "mongoose": "^4.11.11",
