@@ -61,7 +61,14 @@ var chart = new Chart(ctx, {
             ticks:{
               maxTicksLimit:8
             }
-          }]
+          }],
+          yAxes:[{
+            ticks: {
+                max:10,
+                min: 0
+            }
+          }
+          ]
         }
     }
 });
