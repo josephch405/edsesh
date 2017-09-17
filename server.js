@@ -75,7 +75,6 @@ app.get("/teacher2", function(req, res) {
     res.sendFile('public/teacher2.html', { root: __dirname })
 })
 
-<<<<<<< HEAD
 app.get("/teacher3", function(req, res){
   	res.sendFile('public/teacher3.html', {root: __dirname })
   })
@@ -88,12 +87,6 @@ app.get("/getData", function(req,res){
       }
       res.send(200, seshList)
     })
-=======
-app.get("/teacher3", function(req, res) {
-    var sessions = Emotions.distinct("session")
-    console.log(sessions)
-    res.sendFile('public/teacher3.html', { root: __dirname })
->>>>>>> 1547a1455204860c901f2760b841ebd503c88f01
 })
 
 app.get("/ajax/confusion", function(req, res) {
@@ -109,21 +102,22 @@ function updateEngagement(v){
 	engagement = v;
 }
 
-app.post('/img', upload.single('pic'), function (req, res, next) {
-   //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
-   Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
-   Faces.calc_distraction("img/" + req.file.filename, 2, updateDistraction)
-   var s = Emotions.findOne({session: sessionNumber}, function(err, emotion){
-     console.log(emotion)
-     emotion.confusion.push({date: Date.now(), level: confusion})
-     emotion.distraction.push({date: Date.now(), level: distraction})
-     emotion.save()
-   })
-   res.send("done");
+app.post('/img', upload.single('pic'), function(req, res, next) {
+    //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
+    Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
+    Faces.calc_distraction("img/" + req.file.filename, updateDistraction)
+    var s = Emotions.findOne({ session: sessionNumber }, function(err, emotion) {
+        console.log(emotion)
+        emotion.confusion.push({ date: Date.now(), level: confusion })
+        emotion.distraction.push({ date: Date.now(), level: distraction })
+        emotion.save()
+    })
+    res.send("done");
 });
 
-function updateConfusion(v){
-	confusion = v;
+
+function updateConfusion(v) {
+    confusion = confusion / 2 + v / 2;
 }
 
 function updateDistraction(v) {

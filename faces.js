@@ -44,35 +44,37 @@ var Faces = {
             for (var j = 0; j < response.length; j++) {
                 // diff with mean of engaged student data
                 var diff_e_anger = response[j].scores.anger - m_e_anger;
-                var diff_e_contempt = response[j].scores.contempt - m_e_contempt;
-                var diff_e_disgust = response[j].scores.disgust - m_e_disgust;
+                // var diff_e_contempt = response[j].scores.contempt - m_e_contempt;
+                // var diff_e_disgust = response[j].scores.disgust - m_e_disgust;
                 var diff_e_fear = response[j].scores.fear - m_e_fear;
-                var diff_e_happiness = response[j].scores.happiness - m_e_happiness;
-                var diff_e_neutral = response[j].scores.neutral - m_e_neutral;
-                var diff_e_sadness = response[j].scores.sadness - m_e_sadness;
+                // var diff_e_happiness = response[j].scores.happiness - m_e_happiness;
+                // var diff_e_neutral = response[j].scores.neutral - m_e_neutral;
+                // var diff_e_sadness = response[j].scores.sadness - m_e_sadness;
                 var diff_e_surprise = response[j].scores.surprise - m_e_surprise;
                 // diff with mean of un-engaged student data
-                var diff_ue_anger = response[j].scores.anger - m_ue_anger;
-                var diff_ue_contempt = response[j].scores.contempt - m_ue_contempt;
-                var diff_ue_disgust = response[j].scores.disgust - m_ue_disgust;
-                var diff_ue_fear = response[j].scores.fear - m_ue_fear;
-                var diff_ue_happiness = response[j].scores.happiness - m_ue_happiness;
-                var diff_ue_neutral = response[j].scores.neutral - m_ue_neutral;
-                var diff_ue_sadness = response[j].scores.sadness - m_ue_sadness;
-                var diff_ue_surprise = response[j].scores.surprise - m_ue_surprise;
+                // var diff_ue_anger = response[j].scores.anger - m_ue_anger;
+                // var diff_ue_contempt = response[j].scores.contempt - m_ue_contempt;
+                // var diff_ue_disgust = response[j].scores.disgust - m_ue_disgust;
+                // var diff_ue_fear = response[j].scores.fear - m_ue_fear;
+                // var diff_ue_happiness = response[j].scores.happiness - m_ue_happiness;
+                // var diff_ue_neutral = response[j].scores.neutral - m_ue_neutral;
+                // var diff_ue_sadness = response[j].scores.sadness - m_ue_sadness;
+                // var diff_ue_surprise = response[j].scores.surprise - m_ue_surprise;
                 // sum of squares
-                var distance_e = diff_e_anger * diff_e_anger + diff_e_contempt * diff_e_contempt +
-                    diff_e_disgust * diff_e_disgust + diff_e_fear * diff_e_fear +
-                    diff_e_happiness * diff_e_happiness + diff_e_neutral * diff_e_neutral +
-                    diff_e_sadness * diff_e_sadness + diff_e_surprise * diff_e_surprise;
-                var distance_ue = diff_ue_anger * diff_ue_anger + diff_ue_contempt * diff_ue_contempt +
-                    diff_ue_disgust * diff_ue_disgust + diff_ue_fear * diff_ue_fear +
-                    diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
-                    diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
+                // var distance_e = diff_e_anger * diff_e_anger + diff_e_contempt * diff_e_contempt +
+                //     diff_e_disgust * diff_e_disgust + diff_e_fear * diff_e_fear +
+                //     diff_e_happiness * diff_e_happiness + diff_e_neutral * diff_e_neutral +
+                //     diff_e_sadness * diff_e_sadness + diff_e_surprise * diff_e_surprise;
+                // var distance_ue = diff_ue_anger * diff_ue_anger + diff_ue_contempt * diff_ue_contempt +
+                //     diff_ue_disgust * diff_ue_disgust + diff_ue_fear * diff_ue_fear +
+                //     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
+                //     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
                 // confusion of the student
-                var confusion = s - s * Math.tanh(c * distance_ue);
+                var emotion_average = (0.5 * diff_e_anger + 0.5 * diff_e_fear + 2 * diff_e_surprise) / 3;
+                console.log("-----------------------------------average: " + diff_e_anger + " " + diff_e_fear + " " + diff_e_surprise);
+                var confusion = s * Math.tanh(c * 40 * emotion_average) + 1;
                 console.log("The confusion level of student #" + j + "is:" + confusion);
-                confusion_sum += confusion
+                confusion_sum += confusion;
             }
             cb(confusion_sum / response.length);
         }).catch(function(err){
@@ -80,15 +82,45 @@ var Faces = {
         });
     },
 
-    calc_distraction: function(img_path, num_students, cb){
+    calc_distraction: function(img_path, cb){
         console.log('calc distraction start');
         client_recognize.face.detect({
             path: img_path,
             analyzesHeadPose: true,
             returnFaceId: true
         }).then(function(response){
+            console.log('calc distraction cb')
+            var sum_distraction = 0;
+            console.log("response length: " + response.length)
+            // if (response.length < num_students) {
+            //     // account for students that are not detected by the API
+            //     sum_distraction += 10*(num_students - response.length);
+            // }
+            //iterate over all faces detected
+            for (var j = 0; j < response.length; j++){
+                var val_yaw = response[j].faceAttributes.headPose.yaw;
+                // var val_pitch = response[j].faceAttributes.headPose.pitch;
+                // var val_roll = response[j].faceAttributes.headPose.roll;
+                var h_yaw = Math.abs(Math.sin(val_yaw * 4 / 180 * 3.14))
+                sum_distraction += s * h_yaw;   
+            }
+            var distraction = 0;
+            if (response.length != 0){
+                distraction = sum_distraction / response.length;
+            }
+            console.log("The class's distraction level is " + distraction);
+            cb(distraction);
+        });
+    },
+
+    match_face: function(img_path, cb){
+        console.log('calc distraction start');
+        client_recognize.face.detect({
+            path: img_path,
+            returnFaceId: true
+        }).then(function(response){
+            // face recognition
             var faceId_arr = []
-            // faces identified in the image
             for (var j = 0; j < response.length; j++){
                 faceId_arr.push(response[j].faceId)
                 console.log("Face Id: " + response[j].faceId);
@@ -97,43 +129,26 @@ var Faces = {
                faceId_arr,
                'student'
             ).then(function(response){
-                // console.log(response[0]);
-                for (var j = 0; j < response.length; j++){
-                    // get name of each face
-                    var personId = response[j].candidates[0].personId;
-                    console.log("the id of this unknown person is " + personId);
-                    // get name of person
-                    var found_person = false;
-                    for (var ct = 0; ct < student_id_list.length; ct++){
-                        if (student_id_list[ct] == personId){
-                            console.log("Found person: " + student_name_list[ct]);
-                            found_person = true;
-                        }
-                    }
-                    if (!found_person){
-                        console.log("Cannot find this person in our database.");
-                    }
-                }
+                console.log(response[0]);
+                // for (var j = 0; j < response.length; j++){
+                //     // get name of each face
+                //     var personId = response[j].candidates[0].personId;
+                //     console.log("the id of this unknown person is " + personId);
+                //     // get name of person
+                //     var found_person = false;
+                //     for (var ct = 0; ct < student_id_list.length; ct++){
+                //         if (student_id_list[ct] == personId){
+                //             console.log("Found person: " + student_name_list[ct]);
+                //             found_person = true;
+                //         }
+                //     }
+                //     if (!found_person){
+                //         console.log("Cannot find this person in our database.");
+                //     }
+                // }
             }).catch(function(err){
                 console.log("distraction err:", err)
             })
-            console.log('calc distraction cb')
-            var sum_distraction = 0;
-            if (response.length < num_students) {
-                // account for students that are not detected by the API
-                sum_distraction += 10*(num_students - response.length);
-            }
-            //iterate over all faces detected
-            for (var j = 0; j < response.length; j++){
-                var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)/25
-                var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)/50
-                var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)/50
-                var distance = h_yaw * h_yaw + h_pitch * h_pitch + h_roll * h_roll;
-                sum_distraction += s * Math.tanh(c * ((distance)))+ s / 2;   
-            }
-            var distraction = sum_distraction / num_students;
-            console.log("The class's distraction level is " + distraction);
-            cb(distraction);
         });
     },
 
