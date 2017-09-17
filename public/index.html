@@ -22,7 +22,7 @@
                 <b>Student</b>
             </div>
         </a>
-        <a href="./teacher1">
+        <a id="dummy" href="#">
             <div class="block">
                 <img src="./art/instructor.png">
                 <br/>
@@ -34,6 +34,11 @@
     <script src="jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="chartist.min.js"></script>
+    <script language="JavaScript">
+        $("#dummy").on("click", function(){
+            window.alert("This is a premium feature (nice try)")
+        })
+    </script>
 </body>
 
 </html>
