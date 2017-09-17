@@ -1,8 +1,6 @@
 // start project oxford 
 var oxford = require('project-oxford');
-//var client_face = new oxford.Client('0e44c5b59530422ca9d3c6597499689d');
 var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
-// var client_getname = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 var client_emotion = new oxford.Client('f459d95e5a634e2b8536c48f2e82e41c');
 
 // means of engaged students
