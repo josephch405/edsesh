@@ -106,8 +106,8 @@ app.post('/img', upload.single('pic'), function (req, res, next) {
 
    var s = Emotions.findOne({session: sessionNumber}, function(err, emotion){
      console.log(emotion)
-     emotion.confusion.push({date: Date.now(), level: 1})
-     emotion.distraction.push({date: Date.now(), level: 2})
+     emotion.confusion.push({date: Date.now(), level: confusion})
+     emotion.distraction.push({date: Date.now(), level: distraction})
      emotion.save()
    })
    res.send("done");
