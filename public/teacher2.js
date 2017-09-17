@@ -63,13 +63,13 @@ var up = function() {
     $.get("/ajax/distraction", function(pt) {
         var chartData = chart.data.datasets[0].data;
         chartData[chartData.length] = pt;
-        chart.data.labels[chartData.length - 1] = getDateAxis();
+        chart.data.labels[chartData.length-1] = getDateAxis();
         chart.update();
     })
     $.get("/ajax/confusion", function(pt) {
         var chartData = chart.data.datasets[1].data;
         chartData[chartData.length] = pt;
-        chart.data.labels[chartData.length - 1] = getDateAxis();
+        chart.data.labels[chartData.length-1] = getDateAxis();
         chart.update();
     })
 }

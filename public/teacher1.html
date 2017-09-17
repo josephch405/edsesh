@@ -147,4 +147,71 @@
     </script>
 </body>
 
+
+
+	<div id="my_camera"></div>
+
+	<!-- First, include the Webcam.js JavaScript Library -->
+	<script type="text/javascript" src="webcam.js"></script>
+
+	<!-- Configure a few settings and attach camera -->
+	<script language="JavaScript">
+		Webcam.set({
+			width: 640,
+			height: 480,
+			image_format: 'jpeg',
+			jpeg_quality: 100
+		});
+		Webcam.attach( '#my_camera' );
+	</script>
+
+	<div id="results"></div>
+
+
+	<!-- loop for getting webcam images every 3 seconds -->
+	<!-- Code to handle taking the snapshot and displaying it locally -->
+	<script language="JavaScript">
+
+	function dataURItoBlob(dataURI) {
+	    // convert base64/URLEncoded data component to raw binary data held in a string
+	    var byteString;
+	    if (dataURI.split(',')[0].indexOf('base64') >= 0)
+	        byteString = atob(dataURI.split(',')[1]);
+	    else
+	        byteString = unescape(dataURI.split(',')[1]);
+
+	    // separate out the mime component
+	    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+	    // write the bytes of the string to a typed array
+	    var ia = new Uint8Array(byteString.length);
+	    for (var i = 0; i < byteString.length; i++) {
+	        ia[i] = byteString.charCodeAt(i);
+	    }
+
+	    return new Blob([ia], {type:mimeString});
+	}
+
+	setInterval(function(){
+		Webcam.snap( function(data_uri) {
+			// display results in page
+
+			var blob = dataURItoBlob(data_uri);
+
+			var data = new FormData();
+
+			data.append('pic',blob, "image.png")
+			$.ajax({
+				type:"POST",
+				url: "/img",
+				data: data,
+				contentType: false,
+				processData: false
+			});
+		} );
+
+	}, 3000);
+	</script>
+
+</body>
 </html>

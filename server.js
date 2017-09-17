@@ -11,6 +11,8 @@ const crypto = require('crypto')
 
 const Faces = require('./faces')
 
+const Emotions = require('./db')
+
 var dir = './img';
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
@@ -27,6 +29,8 @@ var storage = multer.diskStorage({
   }
 });
 
+var engagement = 0;
+var sessionNumber = 0;
 var icRoster = {};
 var helpRequests = false;
 var helpctr = 0;
@@ -47,11 +51,25 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.get("/teacher1", function(req, res){
-	res.sendFile('public/teacher1.html', {root: __dirname })
+  sessionNumber = new Date().getTime();
+  var s = new Emotions({
+    session: sessionNumber,
+    confusion: [],
+    distraction: []
+  });
+  s.save(function(){
+    res.sendFile('public/teacher1.html', {root: __dirname })
+  });
 })
 
 app.get("/teacher2", function(req, res){
 	res.sendFile('public/teacher2.html', {root: __dirname })
+})
+
+app.get("/teacher3", function(req, res){
+  var sessions = Emotions.distinct("session")
+  console.log(sessions)
+	res.sendFile('public/teacher3.html', {root: __dirname })
 })
 
 app.get("/ajax/confusion", function(req,res){
@@ -62,11 +80,21 @@ app.get("/ajax/distraction", function(req,res){
 	res.send(200, distraction)
 })
 
-var num_students = 1;
+
+function updateEngagement(v){
+	engagement = v;
+}
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
+   //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
    Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
-   Faces.calc_distraction("img/" + req.file.filename, 1, updateDistraction)
+   Faces.calc_distraction("img/" + req.file.filename, 2, updateDistraction)
+   var s = Emotions.findOne({session: sessionNumber}, function(err, emotion){
+     console.log(emotion)
+     emotion.confusion.push({date: Date.now(), level: 1})
+     emotion.distraction.push({date: Date.now(), level: 2})
+     emotion.save()
+   })
    res.send("done");
 });
 
@@ -126,7 +154,6 @@ app.get('/ic/new', function(req, res){
 	icRoster = {};
 	res.send([0, 0, 0, 0])
 })
-
 
 app.get("/student", function(req, res){
 	res.sendFile('public/student.html', {root: __dirname })
