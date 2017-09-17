@@ -145,7 +145,6 @@ app.post("/getChartData", function(req, res) {
         //console.log([sessions.confusion, sessions.distraction])
         res.send(200, [sessions.distraction, sessions.confusion])
     })
->>>>>>> master
 })
 
 
