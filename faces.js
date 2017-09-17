@@ -89,35 +89,6 @@ var Faces = {
             analyzesHeadPose: true,
             returnFaceId: true
         }).then(function(response){
-            // var faceId_arr = []
-            // for (var j = 0; j < response.length; j++){
-            //     faceId_arr.push(response[j].faceId)
-            //     console.log("Face Id: " + response[j].faceId);
-            // }
-            // client_recognize.face.identify(
-            //    faceId_arr,
-            //    'student'
-            // ).then(function(response){
-            //     // console.log(response[0]);
-            //     for (var j = 0; j < response.length; j++){
-            //         // get name of each face
-            //         var personId = response[j].candidates[0].personId;
-            //         console.log("the id of this unknown person is " + personId);
-            //         // get name of person
-            //         var found_person = false;
-            //         for (var ct = 0; ct < student_id_list.length; ct++){
-            //             if (student_id_list[ct] == personId){
-            //                 console.log("Found person: " + student_name_list[ct]);
-            //                 found_person = true;
-            //             }
-            //         }
-            //         if (!found_person){
-            //             console.log("Cannot find this person in our database.");
-            //         }
-            //     }
-            // }).catch(function(err){
-            //     console.log("distraction err:", err)
-            // })
             console.log('calc distraction cb')
             var sum_distraction = 0;
             console.log("response length: " + response.length)
@@ -139,6 +110,45 @@ var Faces = {
             }
             console.log("The class's distraction level is " + distraction);
             cb(distraction);
+        });
+    },
+
+    match_face: function(img_path, cb){
+        console.log('calc distraction start');
+        client_recognize.face.detect({
+            path: img_path,
+            returnFaceId: true
+        }).then(function(response){
+            // face recognition
+            var faceId_arr = []
+            for (var j = 0; j < response.length; j++){
+                faceId_arr.push(response[j].faceId)
+                console.log("Face Id: " + response[j].faceId);
+            }
+            client_recognize.face.identify(
+               faceId_arr,
+               'student'
+            ).then(function(response){
+                console.log(response[0]);
+                // for (var j = 0; j < response.length; j++){
+                //     // get name of each face
+                //     var personId = response[j].candidates[0].personId;
+                //     console.log("the id of this unknown person is " + personId);
+                //     // get name of person
+                //     var found_person = false;
+                //     for (var ct = 0; ct < student_id_list.length; ct++){
+                //         if (student_id_list[ct] == personId){
+                //             console.log("Found person: " + student_name_list[ct]);
+                //             found_person = true;
+                //         }
+                //     }
+                //     if (!found_person){
+                //         console.log("Cannot find this person in our database.");
+                //     }
+                // }
+            }).catch(function(err){
+                console.log("distraction err:", err)
+            })
         });
     },
 
