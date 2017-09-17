@@ -39,12 +39,12 @@ var chart = new Chart(ctx, {
         datasets: [{
             label: "Distraction",
             fill: false,
-            borderColor: 'rgb(200,69,0)',
+            borderColor: 'rgb(255,165,0)',
             data: students.series[0]
         }, {
             label: "Confusion",
             fill: false,
-            borderColor: 'rgb(69,200,0)',
+            borderColor: 'rgb(160,32,240)',
             data: students.series[1]
         }]
     },

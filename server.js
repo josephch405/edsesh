@@ -67,9 +67,17 @@ app.get("/teacher2", function(req, res){
 })
 
 app.get("/teacher3", function(req, res){
-  var sessions = Emotions.distinct("session")
-  console.log(sessions)
-	res.sendFile('public/teacher3.html', {root: __dirname })
+  	res.sendFile('public/teacher3.html', {root: __dirname })
+  })
+
+app.get("/getData", function(req,res){
+    Emotions.find({}, function(err, sessions){
+        var seshList = []
+      for(var i in sessions){
+        seshList.push(sessions[i].session)
+      }
+      res.send(200, seshList)
+    })
 })
 
 app.get("/ajax/confusion", function(req,res){
@@ -81,12 +89,9 @@ app.get("/ajax/distraction", function(req,res){
 	res.send(200, distraction)
 })
 
-
-
 function updateEngagement(v){
 	engagement = v;
 }
-
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
    //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
@@ -94,13 +99,12 @@ app.post('/img', upload.single('pic'), function (req, res, next) {
    Faces.calc_distraction("img/" + req.file.filename, 2, updateDistraction)
    var s = Emotions.findOne({session: sessionNumber}, function(err, emotion){
      console.log(emotion)
-     emotion.confusion.push({date: Date.now(), level: 1})
-     emotion.distraction.push({date: Date.now(), level: 2})
+     emotion.confusion.push({date: Date.now(), level: confusion})
+     emotion.distraction.push({date: Date.now(), level: distraction})
      emotion.save()
    })
    res.send("done");
 });
-
 
 function updateConfusion(v){
 	confusion = v;
@@ -115,12 +119,21 @@ app.post("/nextSlide", function(req,res){
   res.send("sent");
 })
 
+app.post("/getChartData", function(req,res){
+  //console.log(req.body.data)
+  Emotions.findOne({'session': req.body.session}, function(err, sessions){
+  //  console.log(sessions)
+  //  console.log(sessions.confusion)
+  //console.log([sessions.confusion, sessions.distraction])
+    res.send(200, [sessions.distraction,sessions.confusion])
+  })
+})
+
 app.post('/help', function(req,res){
 	//console.log(req.body)
   helpctr +=1;
 	res.send("HELP");
 });
-
 
 app.get('/checkHelp', function (req,res){
   if (helpctr >= 2){
@@ -130,17 +143,6 @@ app.get('/checkHelp', function (req,res){
     res.send(false)
   }
 })
-
-/*
-app.get('/checkHelp', function (req,res){
-  if (helpRequests){
-    helpRequests = false;
-    res.send(true)
-  }
-  else{
-    res.send(false)
-  }
-}) */
 
 app.post('/ic', function(req, res){
 	icRoster[req.body.userId] = req.body.n;
