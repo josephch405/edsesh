@@ -73,7 +73,7 @@ var up = function() {
         chart.update();
     })
 }
-setInterval(up, 3000)
+setInterval(up, 1000)
 
 var checkHelp = function() {
     $.get("/checkHelp", function(status) {

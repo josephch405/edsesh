@@ -63,11 +63,11 @@ app.get("/ajax/distraction", function(req,res){
 	res.send(200, distraction)
 })
 
-var num_students = 2;
+const num_students = 1;
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
    Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
-   Faces.calc_distraction("img/" + req.file.filename, 2, updateDistraction)
+   Faces.calc_distraction("img/" + req.file.filename, num_students, updateDistraction)
    res.send("done");
 });
 
