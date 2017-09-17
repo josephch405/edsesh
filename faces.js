@@ -70,7 +70,7 @@ var Faces = {
                 //     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                 //     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
                 // confusion of the student
-                var emotion_average = (diff_e_anger + diff_e_fear + diff_e_surprise) / 3;
+                var emotion_average = (0.5 * diff_e_anger + 0.5 * diff_e_fear + 2 * diff_e_surprise) / 3;
                 console.log("-----------------------------------average: " + diff_e_anger + " " + diff_e_fear + " " + diff_e_surprise);
                 var confusion = s * Math.tanh(c * 40 * emotion_average) + 1;
                 console.log("The confusion level of student #" + j + "is:" + confusion);
@@ -82,7 +82,7 @@ var Faces = {
         });
     },
 
-    calc_distraction: function(img_path, num_students, cb){
+    calc_distraction: function(img_path, cb){
         console.log('calc distraction start');
         client_recognize.face.detect({
             path: img_path,
@@ -121,10 +121,10 @@ var Faces = {
             console.log('calc distraction cb')
             var sum_distraction = 0;
             console.log("response length: " + response.length)
-            if (response.length < num_students) {
-                // account for students that are not detected by the API
-                sum_distraction += 10*(num_students - response.length);
-            }
+            // if (response.length < num_students) {
+            //     // account for students that are not detected by the API
+            //     sum_distraction += 10*(num_students - response.length);
+            // }
             //iterate over all faces detected
             for (var j = 0; j < response.length; j++){
                 var val_yaw = response[j].faceAttributes.headPose.yaw;
@@ -133,7 +133,10 @@ var Faces = {
                 var h_yaw = Math.abs(Math.sin(val_yaw * 4 / 180 * 3.14))
                 sum_distraction += s * h_yaw;   
             }
-            var distraction = sum_distraction / num_students;
+            var distraction = 0;
+            if (response.length != 0){
+                distraction = sum_distraction / response.length;
+            }
             console.log("The class's distraction level is " + distraction);
             cb(distraction);
         });
