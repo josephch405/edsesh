@@ -75,7 +75,7 @@ var Faces = {
                 console.log("The confusion level of student #" + j + " is:" + confusion);
                 confusion_sum += confusion;
             }
-            cb(confusion_sum / response.length);
+            cb(Math.max(confusion_sum / response.length - 3, 0));
         }).catch(function(err){
             console.log("confusion err:", err)
         });
@@ -104,7 +104,7 @@ var Faces = {
                 distraction = sum_distraction / response.length;
             }
             console.log("The class's distraction level is " + distraction);
-            cb(distraction);
+            cb(Math.max(2*(distraction - 1), 0));
         });
     },
 
