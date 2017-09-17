@@ -75,6 +75,8 @@ var Faces = {
                 confusion_sum += confusion
             }
             cb(confusion_sum / response.length);
+        }).catch(function(err){
+            console.log("confusion err:", err)
         });
     },
 
@@ -112,6 +114,8 @@ var Faces = {
                         console.log("Cannot find this person in our database.");
                     }
                 }
+            }).catch(function(err){
+                console.log("distraction err:", err)
             })
             console.log('calc distraction cb')
             var sum_distraction = 0;
