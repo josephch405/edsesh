@@ -10,22 +10,109 @@
 
 <body>
     <div class="col-xs-12 col-md-8 col-md-offset-2">
-        <div>
-          <canvas id = "chart"></canvas>
-        </div>
-        <br />
-        <br />
+      <br /><br />
+      <div id = "sessionList" class="list-group">
+      </div>
 
-        <div id="overlay" onclick="off()">
-          <img id = "helpimg" src = "https://sitalia25.files.wordpress.com/2014/05/help-wanted-sign.png?w=600">
-        </div>
+      <br />
+      <br />
+      <div>
+        <canvas id = "chart"></canvas>
+      </div>
 
     </div>
 
     <script src="jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="chartist.min.js"></script>
-    <script src="teacher2.js"></script>
 </body>
+
+<script>
+
+function getDateName(time) {
+
+    var d = new Date(time);
+    var datestring = ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "-" +
+        d.getFullYear();;
+
+    return datestring;
+}
+
+function getDateName2(time){
+
+      var d = new Date(time);
+      var datestring = ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "-" + d.getFullYear() + "  " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+
+      return datestring;
+
+}
+
+function getDateAxis(time) {
+    var d = new Date(time);
+    return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+}
+
+$.get("/getData", function(lst) {
+    var container = '';
+      for(var i = 0; i < lst.length; i++){
+        container += '<a href="#" id = "' + lst[i] + '" class="list-group-item list-group-item-action list-group-item-warning" style = "font-size: 20px" onclick = "getChartData(' + lst[i] + ')">' + getDateName2(lst[i]) + '</a>'
+      }
+      $("#sessionList").append(container)
+  })
+
+function getChartData(time){
+  $.post("/getChartData", {session: time}).done(function(data){
+    distractedLabel = []
+    distractedPoint = []
+
+    confusedPoint = []
+    for (var i = 0; i < data[0].length; i++){
+        distractedLabel.push(getDateAxis(data[0][i].date))
+        distractedPoint.push(data[0][i].level)
+    }
+    for (var i = 0; i < data[1].length; i++){
+        confusedPoint.push(data[1][i].level)
+    }
+    var ctx = document.getElementById('chart').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+        // The data for our dataset
+        data: {
+            labels: distractedLabel,
+            datasets: [{
+                label: "Distraction",
+                fill: false,
+                borderColor: 'rgb(255,165,0)',
+                data: distractedPoint
+            }, {
+                label: "Confusion",
+                fill: false,
+                borderColor: 'rgb(160,32,240)',
+                data: confusedPoint
+            }]
+        },
+
+        // Configuration options go here
+        options: {
+            title: {
+                display: true,
+                position: "top",
+                text: "Session " + getDateName(time)
+            },
+            scales:{
+              xAxes:[{
+                ticks:{
+                  maxTicksLimit:8
+                }
+              }]
+            }
+        }
+    });
+    $("#chart").appendTo("#" + time)
+  })
+}
+
+</script>
 
 </html>

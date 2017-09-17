@@ -39,12 +39,12 @@ var chart = new Chart(ctx, {
         datasets: [{
             label: "Distraction",
             fill: false,
-            borderColor: 'rgb(200,69,0)',
+            borderColor: 'rgb(255,165,0)',
             data: students.series[0]
         }, {
             label: "Confusion",
             fill: false,
-            borderColor: 'rgb(69,200,0)',
+            borderColor: 'rgb(160,32,240)',
             data: students.series[1]
         }]
     },
@@ -55,6 +55,13 @@ var chart = new Chart(ctx, {
             display: true,
             position: "top",
             text: "Session " + getDateName()
+        },
+        scales:{
+          xAxes:[{
+            ticks:{
+              maxTicksLimit:8
+            }
+          }]
         }
     }
 });
@@ -73,13 +80,16 @@ var up = function() {
         chart.update();
     })
 }
+
 setInterval(up, 1000)
 
 var checkHelp = function() {
-    $.get("/checkHelp", function(status) {
-        if (status){
-          on();
+    $.get("/checkHelp", function(list) {
+        $("#helpbox").html("")
+        for(var i in list){
+            $("#helpbox").append("<div class = 'hbox hbox-" + list[i] + "'></div>")
         }
+        console.log(list)
     })
 }
 
