@@ -1,33 +1,44 @@
 const http = require('http');
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const csvWriter = require('csv-write-stream');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
-const path = require('path')
 const multer  = require('multer')
-const crypto = require('crypto')
 
 const Faces = require('./faces')
 
 const Emotions = require('./db')
 
+// FILESYSTEM INITIALIZATION
 var dir = './img';
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
 }
+
+const directory = 'img';
+
+fs.readdir(directory, (err, files) => {
+  if (err) throw error;
+
+  for (const file of files) {
+    fs.unlink(path.join(directory, file), err => {
+      if (err) throw error;
+    });
+  }
+});
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './img/')
   },
   filename: function (req, file, cb) {
-    crypto.pseudoRandomBytes(16, function (err, raw) {
-      cb(null, Date.now() + '.jpg');
-    });
+  	cb(null, Date.now() + '.jpg');
   }
 });
+
+// END OF FILESYSTEM STUFF
 
 var engagement = 0;
 var sessionNumber = 0;
@@ -81,12 +92,9 @@ app.get("/ajax/distraction", function(req,res){
 	res.send(200, distraction)
 })
 
-
-
 function updateEngagement(v){
 	engagement = v;
 }
-
 
 app.post('/img', upload.single('pic'), function (req, res, next) {
    //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)

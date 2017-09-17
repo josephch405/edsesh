@@ -82,6 +82,7 @@ var checkHelp = function() {
         }
     })
 }
+
 setInterval(checkHelp, 1000)
 
 function on() {
