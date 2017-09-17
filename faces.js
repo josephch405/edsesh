@@ -71,9 +71,8 @@ var Faces = {
                 //     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
                 // confusion of the student
                 var emotion_average = (0.5 * diff_e_anger + 0.5 * diff_e_fear + 2 * diff_e_surprise) / 3;
-                console.log("-----------------------------------average: " + diff_e_anger + " " + diff_e_fear + " " + diff_e_surprise);
                 var confusion = s * Math.tanh(c * 40 * emotion_average) + 1;
-                console.log("The confusion level of student #" + j + "is:" + confusion);
+                console.log("The confusion level of student #" + j + " is:" + confusion);
                 confusion_sum += confusion;
             }
             cb(confusion_sum / response.length);
@@ -92,10 +91,6 @@ var Faces = {
             console.log('calc distraction cb')
             var sum_distraction = 0;
             console.log("response length: " + response.length)
-            // if (response.length < num_students) {
-            //     // account for students that are not detected by the API
-            //     sum_distraction += 10*(num_students - response.length);
-            // }
             //iterate over all faces detected
             for (var j = 0; j < response.length; j++){
                 var val_yaw = response[j].faceAttributes.headPose.yaw;
@@ -121,35 +116,43 @@ var Faces = {
         }).then(function(response){
             // face recognition
             var faceId_arr = []
+            if (response.length == 0){
+                cb(faceId_arr);
+                return;
+            }
             for (var j = 0; j < response.length; j++){
                 faceId_arr.push(response[j].faceId)
                 console.log("Face Id: " + response[j].faceId);
             }
-            client_recognize.face.identify(
+            console.log(Faces.match_face_by_arr(faceId_arr));
+            cb(Faces.match_face_by_arr(faceId_arr));
+            }).catch(function(err){
+                console.log("match face err:", err)
+            })
+    },
+
+    match_face_by_arr: function(faceId_arr){
+        client_recognize.face.identify(
                faceId_arr,
                'student'
-            ).then(function(response){
-                console.log(response[0]);
-                // for (var j = 0; j < response.length; j++){
-                //     // get name of each face
-                //     var personId = response[j].candidates[0].personId;
-                //     console.log("the id of this unknown person is " + personId);
-                //     // get name of person
-                //     var found_person = false;
-                //     for (var ct = 0; ct < student_id_list.length; ct++){
-                //         if (student_id_list[ct] == personId){
-                //             console.log("Found person: " + student_name_list[ct]);
-                //             found_person = true;
-                //         }
-                //     }
-                //     if (!found_person){
-                //         console.log("Cannot find this person in our database.");
-                //     }
-                // }
-            }).catch(function(err){
-                console.log("distraction err:", err)
+            ).then(function(response_recog){
+                var identified_names = [];
+                for (var k = 0; k < response_recog.length; k++){
+                    if (response_recog[k].candidates.length == 0){
+                        continue;
+                    }
+                    var personId = response_recog[k].candidates[0].personId;
+                    // get name of person
+                    for (var ct = 0; ct < student_id_list.length; ct++){
+                        if (student_id_list[ct] == personId){
+                            console.log("Found person: " + student_name_list[ct]);
+                            identified_names.push(student_name_list[ct]);
+                        }
+                    }
+                }
+                console.log(identified_names);
+                return identified_names;
             })
-        });
     },
 
     prepare_emotion_data: function() {
@@ -186,6 +189,5 @@ var Faces = {
         });
     }
 }
-
 
 module.exports = Faces;
