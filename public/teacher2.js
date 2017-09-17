@@ -1,32 +1,29 @@
-
 var students = {
-    // A labels array that can contain any sort of values
-    //labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-    // Our series array that contains series objects or in this case series data arrays
-      series: [
+    series: [
+        [0],
         [0]
     ]
 };
 
 var genNew = function(pt) {
-	data.series[0].splice(0, 1)
-	data.series[0].push(pt)
+    data.series[0].splice(0, 1)
+    data.series[0].push(pt)
     return data;
 }
 
-function getDateName(){
+function getDateName() {
 
-  var d = new Date();
-  var datestring =  ("0"+(d.getMonth()+1)).slice(-2) + "-"  +("0" + d.getDate()).slice(-2) + "-" +
-    d.getFullYear();;
+    var d = new Date();
+    var datestring = ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "-" +
+        d.getFullYear();;
 
-  return datestring;
+    return datestring;
 
 }
 
-function getDateAxis(){
-  var d = new Date();
-  return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) +":" + ("0" + d.getSeconds()).slice(-2)  ;
+function getDateAxis() {
+    var d = new Date();
+    return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
 }
 
 // Create a new line chart object where as first parameter we pass in a selector
@@ -40,31 +37,62 @@ var chart = new Chart(ctx, {
     // The data for our dataset
     data: {
         datasets: [{
-            label: "Student 1",
+            label: "Distraction",
             fill: false,
             borderColor: 'rgb(200,69,0)',
             data: students.series[0]
+        }, {
+            label: "Confusion",
+            fill: false,
+            borderColor: 'rgb(69,200,0)',
+            data: students.series[1]
         }]
     },
 
     // Configuration options go here
     options: {
-      title: {
-        display: true,
-        position: "top",
-        text: "Session " + getDateName()
-      }
+        title: {
+            display: true,
+            position: "top",
+            text: "Session " + getDateName()
+        }
     }
 });
 
 var up = function() {
-	$.get("/ajax/engagement", function(pt){
+    $.get("/ajax/distraction", function(pt) {
         var chartData = chart.data.datasets[0].data;
         chartData[chartData.length] = pt;
-        chart.data.labels[chartData.length-1] = getDateAxis();
+        chart.data.labels[chartData.length - 1] = getDateAxis();
         chart.update();
-      })
-	}
-
-
+    })
+    $.get("/ajax/confusion", function(pt) {
+        var chartData = chart.data.datasets[1].data;
+        chartData[chartData.length] = pt;
+        chart.data.labeals[chartData.length - 1] = getDateAxis();
+        chart.update();
+    })
+}
 setInterval(up, 3000)
+
+var checkHelp = function() {
+    $.get("/checkHelp", function(status) {
+        if (status){
+          on();
+        }
+    })
+}
+setInterval(checkHelp, 1000)
+
+function on() {
+    document.getElementById("overlay").style.display = "block";
+}
+
+function off() {
+    document.getElementById("overlay").style.display = "none";
+    $.ajax({
+      type: "POST",
+      url: "nextSlide",
+      data: 0
+    });
+}

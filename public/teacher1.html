@@ -1,19 +1,150 @@
 <html lang="en">
+
 <head>
     <link rel="stylesheet" href="chartist.min.css">
     <link rel="stylesheet" href="bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="main.less">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 </head>
+<div id="t1Modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Student Poll</h4>
+            </div>
+            <div class="modal-body">
+                <div id="pieDiv">
+                    <canvas id="chart"></canvas>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="button" id="newPoll" type="button">New Poll</button>
+                <button class="button" type="button" data-dismiss="modal">Done</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <body>
-    <div class="col-xs-12 col-md-8 col-md-offset-2">
-
+    <div id="teacher1" class="col-xs-12 col-md-8 col-md-offset-2">
+        <iframe id="presentation" src="https://docs.google.com/presentation/d/e/2PACX-1vTIAvaegRYpOpDEJ3SdbZ6heEQT8f1wFH-aU9CA6hBxXBeBrZSiEGS-iAHapOrLBlv9rYOxNJPikdOL/embed?start=false&loop=true&delayms=30000" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
     </div>
-
+    <div id="bottomBar">
+        <img id="bottomLogo" src="./art/logo.png">
+        <a href="./teacher2" target="_blank">
+            <div class="button">Analytics</div>
+        </a>
+        <a href="#">
+            <div id="polling" class="button">Polling</div>
+        </a>
+    </div>
     <script src="jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="chartist.min.js"></script>
+    <div id="my_camera"></div>
+    <script type="text/javascript" src="webcam.js"></script>
+    <script language="JavaScript">
+    Webcam.set({
+        width: 640,
+        height: 480,
+        image_format: 'jpeg',
+        jpeg_quality: 100
+    });
+    Webcam.attach('#my_camera');
+    </script>
+    <div id="results"></div>
+
+<script language="JavaScript">
+
+    function dataURItoBlob(dataURI) {
+        // convert base64/URLEncoded data component to raw binary data held in a string
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0)
+            byteString = atob(dataURI.split(',')[1]);
+        else
+            byteString = unescape(dataURI.split(',')[1]);
+
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+        // write the bytes of the string to a typed array
+        var ia = new Uint8Array(byteString.length);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        return new Blob([ia], { type: mimeString });
+    }
+
+    setInterval(function() {
+        Webcam.snap(function(data_uri) {
+            // display results in page
+
+            var blob = dataURItoBlob(data_uri);
+
+            var data = new FormData();
+
+            data.append('pic', blob, "image.png")
+            $.ajax({
+                type: "POST",
+                url: "/img",
+                data: data,
+                contentType: false,
+                processData: false
+            });
+        });
+
+    }, 1000);
+
+    var ctx = {};
+    var data = {};
+    var pChart = {};
+    var up = function() {
+        $.get("/ic/list", function(list) {
+            pChart.data.datasets[0].data = list;
+            pChart.update();
+        })
+    }
+
+    $('#newPoll').on("click", function() {
+        $.get("/ic/new", function(list) {
+            pChart.data.datasets[0].data = list;
+            pChart.update();
+        })
+    })
+
+    $("#polling").on("click", function() {
+
+        ctx = document.getElementById('chart').getContext('2d');
+        data = {
+            datasets: [{
+                data: [0, 0, 0],
+                backgroundColor: ["#00A2FF", "#09F941", "#9C00FF", "#FF0000"]
+            }],
+            labels: [
+                'A', 'B', 'C', 'D'
+            ]
+        }
+
+        pChart = new Chart(ctx, {
+            type: 'pie',
+            data: data
+        });
+
+        up();
+
+        setInterval(up, 3000)
+
+        $("#t1Modal").modal({
+            keyboard: false
+        })
+    })
+    </script>
 </body>
 
 
