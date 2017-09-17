@@ -85,47 +85,48 @@ var Faces = {
             analyzesHeadPose: true,
             returnFaceId: true
         }).then(function(response){
-            var faceId_arr = []
+            // var faceId_arr = []
             // faces identified in the image
-            for (var j = 0; j < response.length; j++){
-                faceId_arr.push(response[j].faceId)
-                console.log("Face Id: " + response[j].faceId);
-            }
-            client_recognize.face.identify(
-               faceId_arr,
-               'student'
-            ).then(function(response){
-                // console.log(response[0]);
-                for (var j = 0; j < response.length; j++){
-                    // get name of each face
-                    var personId = response[j].candidates[0].personId;
-                    console.log("the id of this unknown person is " + personId);
-                    // get name of person
-                    var found_person = false;
-                    for (var ct = 0; ct < student_id_list.length; ct++){
-                        if (student_id_list[ct] == personId){
-                            console.log("Found person: " + student_name_list[ct]);
-                            found_person = true;
-                        }
-                    }
-                    if (!found_person){
-                        console.log("Cannot find this person in our database.");
-                    }
-                }
-            })
+            // for (var j = 0; j < response.length; j++){
+            //     faceId_arr.push(response[j].faceId)
+            //     console.log("Face Id: " + response[j].faceId);
+            // }
+            // client_recognize.face.identify(
+            //    faceId_arr,
+            //    'student'
+            // ).then(function(response){
+            //     // console.log(response[0]);
+            //     for (var j = 0; j < response.length; j++){
+            //         // get name of each face
+            //         var personId = response[j].candidates[0].personId;
+            //         console.log("the id of this unknown person is " + personId);
+            //         // get name of person
+            //         var found_person = false;
+            //         for (var ct = 0; ct < student_id_list.length; ct++){
+            //             if (student_id_list[ct] == personId){
+            //                 console.log("Found person: " + student_name_list[ct]);
+            //                 found_person = true;
+            //             }
+            //         }
+            //         if (!found_person){
+            //             console.log("Cannot find this person in our database.");
+            //         }
+            //     }
+            // })
             console.log('calc distraction cb')
             var sum_distraction = 0;
+            console.log("response length: " + response.length)
             if (response.length < num_students) {
                 // account for students that are not detected by the API
                 sum_distraction += 10*(num_students - response.length);
             }
             //iterate over all faces detected
             for (var j = 0; j < response.length; j++){
-                var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)/25
-                var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)/50
-                var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)/50
+                var h_yaw = Math.abs(response[j].faceAttributes.headPose.yaw)/10
+                var h_pitch = Math.abs(response[j].faceAttributes.headPose.pitch)/20
+                var h_roll = Math.abs(response[j].faceAttributes.headPose.roll)/20
                 var distance = h_yaw * h_yaw + h_pitch * h_pitch + h_roll * h_roll;
-                sum_distraction += s * Math.tanh(c * ((distance)))+ s / 2;   
+                sum_distraction += s * Math.tanh(distance);   
             }
             var distraction = sum_distraction / num_students;
             console.log("The class's distraction level is " + distraction);
