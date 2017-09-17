@@ -11,6 +11,8 @@ const crypto = require('crypto')
 
 const Faces = require('./faces')
 
+const Emotions = require('./db')
+
 var dir = './img';
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
@@ -78,9 +80,15 @@ app.get("/ajax/distraction", function(req,res){
 	res.send(200, distraction)
 })
 
+
+function updateEngagement(v){
+	engagement = v;
+}
+
 app.post('/img', upload.single('pic'), function (req, res, next) {
    //Faces.calc_attention("img/1505574244769.jpg")// + req.file.filename)
-   Faces.calc_attention("img/" + req.file.filename, updateEngagement)
+   Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
+   Faces.calc_distraction("img/" + req.file.filename, 2, updateDistraction)
    var s = Emotions.findOne({session: sessionNumber}, function(err, emotion){
      console.log(emotion)
      emotion.confusion.push({date: Date.now(), level: 1})
@@ -146,7 +154,6 @@ app.get('/ic/new', function(req, res){
 	icRoster = {};
 	res.send([0, 0, 0, 0])
 })
-
 
 app.get("/student", function(req, res){
 	res.sendFile('public/student.html', {root: __dirname })
