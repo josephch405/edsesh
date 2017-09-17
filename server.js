@@ -115,11 +115,11 @@ app.post('/img', upload.single('pic'), function (req, res, next) {
 
 
 function updateConfusion(v) {
-    confusion = confusion / 2 + v / 2;
+    confusion = confusion * 3/ 4 + v / 4;
 }
 
 function updateDistraction(v) {
-    distraction = distraction / 2 + v / 2;
+    distraction = distraction * 3 / 4 + v / 4;
 }
 
 function updatePersonName(arr_names){
