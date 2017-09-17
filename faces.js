@@ -75,7 +75,7 @@ var Faces = {
                 console.log("The confusion level of student #" + j + " is:" + confusion);
                 confusion_sum += confusion;
             }
-            cb(Math.max(confusion_sum / response.length - 3, 0));
+            cb(1.3*Math.max(confusion_sum / response.length - 3, 0));
         }).catch(function(err){
             console.log("confusion err:", err)
         });
