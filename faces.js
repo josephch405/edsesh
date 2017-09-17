@@ -1,4 +1,4 @@
-// start project oxford 
+// start project oxford
 var oxford = require('project-oxford');
 var client_recognize = new oxford.Client('20e0adac0cc442bc8c86d27c0c2f956c');
 var client_emotion = new oxford.Client('f459d95e5a634e2b8536c48f2e82e41c');
@@ -74,7 +74,7 @@ var Faces = {
                 console.log("The confusion level of student #" + j + "is:" + confusion);
                 confusion_sum += confusion
             }
-            cb(confusion_sum / response.length);            
+            cb(confusion_sum / response.length);
         });
     },
 
@@ -93,9 +93,9 @@ var Faces = {
             }
             client_recognize.face.identify(
                faceId_arr,
-               'student'    
+               'student'
             ).then(function(response){
-                // console.log(response[0]);             
+                // console.log(response[0]);
                 for (var j = 0; j < response.length; j++){
                     // get name of each face
                     var personId = response[j].candidates[0].personId;

@@ -28,6 +28,8 @@ var storage = multer.diskStorage({
 });
 
 var icRoster = {};
+var helpRequests = false;
+var helpctr = 0;
 
 var confusion = 0;
 var distraction = 0;
@@ -78,10 +80,37 @@ function updateDistraction(v){
 	distraction = v;
 }
 
+app.post("/nextSlide", function(req,res){
+  helpctr = 0;
+  res.send("sent");
+})
+
 app.post('/help', function(req,res){
 	//console.log(req.body)
-	res.send("")
+  helpctr +=1;
+	res.send("HELP");
 });
+
+
+app.get('/checkHelp', function (req,res){
+  if (helpctr >= 2){
+    res.send(true)
+  }
+  else{
+    res.send(false)
+  }
+})
+
+/*
+app.get('/checkHelp', function (req,res){
+  if (helpRequests){
+    helpRequests = false;
+    res.send(true)
+  }
+  else{
+    res.send(false)
+  }
+}) */
 
 app.post('/ic', function(req, res){
 	icRoster[req.body.userId] = req.body.n;
