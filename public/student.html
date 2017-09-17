@@ -40,7 +40,6 @@
     <div id="student" class="col-xs-12 col-md-8 col-md-offset-2">
         <br><br>
         <input class="button sButton" type="button" id="help" value="HELP" onclick='submitPanic()'>
-        <input class="button sButton" type="button" id="ask" value="ASK" onclick='question()'>
         <br><br><br><br>
         <input class="button sButton" type="button" id="AA" value="A" onclick='ic(0)'>
         <input class="button sButton" type="button" id="BB" value="B" onclick='ic(1)'>
@@ -58,7 +57,9 @@ function submitPanic() {
     $.ajax({
         type: "POST",
         url: '/help',
-        data: document.getElementById("help").value
+        data: {
+            userId: userId
+        }
     })
 }
 function ic(n){
