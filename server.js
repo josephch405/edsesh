@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer')
 
 const Faces = require('./faces')
+const student_name_list = ['Mr. Yu', 'Miss Deng', 'Mr. Chuang', 'Miss Lin'];
 
 const Emotions = require('./db')
 
@@ -46,7 +47,8 @@ var icRoster = {};
 var helpRoster = {};
 var confusion = 0;
 var distraction = 0;
-var name = [];
+var names = [];
+var facesArr = [false, false, false, false]
 
 var upload = multer({ storage: storage })
 
@@ -105,31 +107,33 @@ app.get("/ajax/distraction", function(req, res) {
     res.send(200, distraction)
 })
 
-app.post('/img', upload.single('pic'), function (req, res, next) {
-   Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
-   Faces.calc_distraction("img/" + req.file.filename, updateDistraction)
-   Faces.match_face("img/" + req.file.filename, updatePersonName)
+app.post('/img', upload.single('pic'), function(req, res, next) {
+    Faces.calc_confusion("img/" + req.file.filename, updateConfusion)
+    Faces.calc_distraction("img/" + req.file.filename, updateDistraction)
+    Faces.match_face("img/" + req.file.filename, updatePersonName)
 
-   var s = Emotions.findOne({session: sessionNumber}, function(err, emotion){
-     console.log(emotion)
-     emotion.confusion.push({date: Date.now(), level: confusion})
-     emotion.distraction.push({date: Date.now(), level: distraction})
-     emotion.save()
-   })
-   res.send("done");
+    var s = Emotions.findOne({ session: sessionNumber }, function(err, emotion) {
+        console.log(emotion)
+        if (emotion) {
+            emotion.confusion.push({ date: Date.now(), level: confusion })
+            emotion.distraction.push({ date: Date.now(), level: distraction })
+            emotion.save()
+        }
+    })
+    res.send("done");
 });
 
 
 function updateConfusion(v) {
-    confusion = confusion * 3/ 4 + v / 4;
+    confusion = confusion * 3 / 4 + v / 4;
 }
 
 function updateDistraction(v) {
     distraction = distraction * 3 / 4 + v / 4;
 }
 
-function updatePersonName(arr_names){
-	name = arr_names;
+function updatePersonName(arr_names) {
+    names = arr_names;
 }
 
 app.post("/nextSlide", function(req, res) {
@@ -191,6 +195,17 @@ app.get('/ic/list', function(req, res) {
 app.get('/ic/new', function(req, res) {
     icRoster = {};
     res.send([0, 0, 0, 0])
+})
+
+app.get('/faces', function(req, res) {
+    for (var i in student_name_list) {
+        let sname = student_name_list[i]
+        if (names.includes(sname)) {
+            facesArr[i] = true;
+        }
+    }
+
+    res.send(facesArr)
 })
 
 app.get("/student", function(req, res) {

@@ -124,14 +124,13 @@ var Faces = {
                 faceId_arr.push(response[j].faceId)
                 console.log("Face Id: " + response[j].faceId);
             }
-            console.log(Faces.match_face_by_arr(faceId_arr));
-            cb(Faces.match_face_by_arr(faceId_arr));
+            console.log(Faces.match_face_by_arr(faceId_arr, cb));
             }).catch(function(err){
                 console.log("match face err:", err)
             })
     },
 
-    match_face_by_arr: function(faceId_arr){
+    match_face_by_arr: function(faceId_arr, cb){
         client_recognize.face.identify(
                faceId_arr,
                'student'
@@ -151,6 +150,7 @@ var Faces = {
                     }
                 }
                 console.log(identified_names);
+                cb(identified_names);
                 return identified_names;
             })
     },
