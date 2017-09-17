@@ -56,7 +56,7 @@ app.post('/img', upload.single('pic'), function (req, res, next) {
 });
 
 function updateEngagement(v){
-	engagement = v;
+	confusion = v;
 }
 
 function updateDistraction(v){

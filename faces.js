@@ -32,11 +32,11 @@ const student_list = ['Mr. Yu','Miss Deng','Mr. Chuang','Miss Lin'];
 
 var Faces = {
     calc_confusion: function(img_path, cb) {
-        console.log("calc attention start")
+        console.log("calc confusion start")
         client_emotion.emotion.analyzeEmotion({
             path: img_path,
         }).then(function(response) {
-            console.log("calc attention cb")
+            console.log("calc confusion cb")
             // iterate over all faces in the image
             console.log("")
             for (var j = 0; j < response.length; j++) {
@@ -68,9 +68,9 @@ var Faces = {
                     diff_ue_happiness * diff_ue_happiness + diff_ue_neutral * diff_ue_neutral +
                     diff_ue_sadness * diff_ue_sadness + diff_ue_surprise * diff_ue_surprise;
                 // engagement of the student
-                var engagement = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
-                console.log("Your attention level is:" + engagement);
-                cb(engagement);
+                var confusion = s * Math.tanh(c * ((distance_e - distance_ue))) + s / 2;
+                console.log("Your confusion level is:" + confusion);
+                cb(confusion);
             }
         });
     },
